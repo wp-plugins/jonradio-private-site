@@ -1,7 +1,7 @@
 === jonradio Private Site ===
 Contributors: jonradio
 Donate link: http://jonradio.com/plugins
-Tags: login
+Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.4
 Stable tag: 1.0
