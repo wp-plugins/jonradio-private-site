@@ -3,7 +3,7 @@
 Plugin Name: jonradio Private Site
 Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
 Description: Removes visibility of site, by forcing login before any content can be viewed.
-Version: 1.0
+Version: 1.1
 Author: jonradio
 Author URI: http://jonradio.com/plugins
 License: GPLv2
@@ -27,7 +27,7 @@ License: GPLv2
 */
 
 add_action( 'login_init', 'jr_ps_login' );
-add_action( 'wp_head', 'jr_ps_force_login' );
+add_action( 'wp', 'jr_ps_force_login' );
 
 /**
  * Login Detection
