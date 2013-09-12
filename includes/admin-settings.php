@@ -100,6 +100,17 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_private_settings_section' 
 	);
+	add_settings_section( 'jr_ps_self_registration_section', 
+		'Allow Self-Registration', 
+		'jr_ps_self_registration_expl', 
+		'jr_ps_settings_page' 
+	);
+	add_settings_field( 'reveal_registration', 
+		'Reveal User Registration Page', 
+		'jr_ps_echo_reveal_registration', 
+		'jr_ps_settings_page', 
+		'jr_ps_self_registration_section' 
+	);
 	add_settings_section( 'jr_ps_landing_settings_section', 
 		'Landing Location', 
 		'jr_ps_landing_settings_expl', 
@@ -146,6 +157,33 @@ function jr_ps_echo_private_site() {
 
 /**
  * Section text for Section2
+ * 
+ * Display an explanation of this Section
+ *
+ */
+function jr_ps_self_registration_expl() {
+	?>
+	<p>
+	If you want Users to be able to Register themselves,
+	please check the checkbox below
+	or the Registration page will be blocked by this plugin
+	when you select Private Site above.
+	(You must also select <b>Membership</b> in <b>General Settings</b> or, for Multi-Site, <b>Allow New Registrations</b> in <b>Network Settings</b>)
+	</p>
+	<?php
+}
+
+function jr_ps_echo_reveal_registration() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="reveal_registration" name="jr_ps_settings[reveal_registration]" value="true"';
+	if ( $settings['reveal_registration'] ) {
+		echo ' checked="checked"';
+	}
+	echo ' />';
+}
+
+/**
+ * Section text for Section3
  * 
  * Display an explanation of this Section
  *
@@ -204,6 +242,12 @@ function jr_ps_validate_settings( $input ) {
 		$valid['private_site'] = FALSE;
 	}
 	
+	if ( array_key_exists( 'reveal_registration', $input ) && ( $input['reveal_registration'] === 'true' ) ) {
+		$valid['reveal_registration'] = TRUE;
+	} else {
+		$valid['reveal_registration'] = FALSE;
+	}
+	
 	$valid['landing'] = $input['landing'];
 	
 	if ( trim( $input['specific_url'] ) ) {
@@ -236,7 +280,7 @@ function jr_ps_validate_settings( $input ) {
 			add_settings_error(
 				'jr_ps_settings',
 				'jr_ps_nourlerror',
-				'Error in Landing Location: <b>Go to specific URL</b> selected but no URL specified.',
+				'Error in Landing Location: <i>Go to Specific URL</i> selected but no URL specified.',
 				'error'
 			);
 		}

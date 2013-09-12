@@ -4,7 +4,7 @@
 	Used to create the Settings page for the plugin.
 */
 
-add_action('network_admin_menu', 'jr_ps_network_admin_hook' );
+add_action( 'network_admin_menu', 'jr_ps_network_admin_hook' );
 //	Runs just after admin_init
 
 /**

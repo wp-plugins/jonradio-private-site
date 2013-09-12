@@ -3,7 +3,7 @@
 Plugin Name: jonradio Private Site
 Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
 Description: Creates a Private Site by allowing only those logged on to view the WordPress web site.  Settings select the initial destination after login.
-Version: 2.0
+Version: 2.1
 Author: jonradio
 Author URI: http://jonradio.com/plugins
 License: GPLv2
@@ -91,9 +91,10 @@ if ( ( FALSE === ( $internal_settings = get_option( 'jr_ps_internal_settings' ) 
 $settings = get_option( 'jr_ps_settings' );
 if ( empty( $settings ) ) {
 	$settings = array(
-		'private_site' => FALSE,
-		'landing'      => 'return',
-		'specific_url' => ''
+		'private_site'        => FALSE,
+		'reveal_registration' => FALSE,
+		'landing'             => 'return',
+		'specific_url'        => ''
 	);
 	/*	Add if Settings don't exist, re-initialize if they were empty.
 	*/
@@ -118,9 +119,10 @@ if ( version_compare( $old_version, $jr_ps_plugin_data['Version'], '!=' ) ) {
 
 	/*	Handle all Settings changes made in old plugin versions
 	*/
-	/*	None yet, so no need to:
+	if ( version_compare( $old_version, '2.1', '<' ) ) {
+		$settings['reveal_registration'] = FALSE;
+	}
 	update_option( 'jr_ps_settings', $settings );
-	*/
 }
 
 if ( is_admin() ) {
@@ -142,7 +144,20 @@ if ( is_admin() ) {
 	require_once( jr_ps_path() . 'includes/installed-plugins.php' );
 } else {
 	//	Public WordPress content, i.e. - not Admin pages
-	if ( $settings['private_site'] === TRUE ) {
+	$reveal = FALSE;
+	if ( ( TRUE === $settings['private_site'] ) && ( TRUE === $settings['reveal_registration'] ) ) {
+		function jr_ps_match_register( $reg_url ) {
+			return ( 0 === strcasecmp( $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'], substr( $reg_url, 3 + strpos( $reg_url, '://' ) ) ) );
+		}
+		if ( jr_ps_match_register( wp_registration_url() ) ) {
+			$reveal = TRUE;
+		} else {
+			if ( is_multisite() && jr_ps_match_register( get_site_url( 0, 'wp-signup.php' ) ) ) {
+				$reveal = TRUE;
+			}
+		}
+	}
+	if ( FALSE === $reveal ) {	
 		//	Private Site code
 		require_once( jr_ps_path() . 'includes/public.php' );
 	}

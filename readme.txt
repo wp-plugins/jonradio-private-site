@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,9 @@ Allows the Administrator to restrict a WordPress-based web site to viewing only 
 
 Any attempt to view any Page, Post or other part of the site will see anyone not logged on greeted by a WordPress login screen.  A Settings Page allows the Administrator to determine where Users will be automatically directed to each time that they login, a "Landing Location".
 
-A Setting also allows the Private Site feature to be turned off.  When the plugin is installed and activated, the Private Site feature is set off by default, to allow the Administrator an opportunity to become familiarized with the plugin's features and to set the desired settings.  A warning that the site is not private appears after first activation of the plugin until the Administrator visits the plugin's Settings page.
+If you allow Self-Registration, where new Users can Register themselves, you will need to select the "Reveal User Registration Page" setting or new Users will be blocked from seeing the WordPress Registration screen.
+
+Another Setting allows the Private Site feature to be turned off.  When the plugin is installed and activated, the Private Site feature is set off by default, to allow the Administrator an opportunity to become familiarized with the plugin's features and to set the desired settings.  A warning that the site is not private appears after first activation of the plugin until the Administrator visits the plugin's Settings page.
 
 If a WordPress Network is defined, the plugin can be activated individually for select sites.  Or Network Activated.  In either case, each site will have its own Settings page where the Private Site feature can be turned off (default) or on for just the one site, and a Landing Location defined for each site.
 
@@ -26,13 +28,17 @@ Yes, there are other plugins that hide some or all WordPress content for any sit
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
+This section describes how to install the *jonradio Private Site* plugin and get it working.
 
-1. Use "Add Plugin" within the WordPress Admin panel to download and install this plugin from the WordPress.org plugin repository (preferred method).  Or download and unzip this plugin, then upload the `/jonradio-private-site/` directory to your WordPress web site's `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress.  If you have a WordPress Network ("Multisite"), you can either Network Activate this plugin, or Activate it individually on the sites where you wish to use it.
-1. Go the Settings page to make the Site Private, and set where the user ends up after logging in.
+1. Use **Add Plugin** within the WordPress Admin panel to download and install this *jonradio Private Site* plugin from the WordPress.org plugin repository (preferred method).  Or download and unzip this plugin, then upload the `/jonradio-private-site/` directory to your WordPress web site's `/wp-content/plugins/` directory
+1. Activate the *jonradio Private Site* plugin through the **Installed Plugins** Admin panel in WordPress.  If you have a WordPress Network ("Multisite"), you can either **Network Activate** this plugin, or Activate it individually on the sites where you wish to use it.
+1. Go to the plugin's Settings page to make the Site **Private*, and set where the user ends up after logging in: the **Landing Location**.
+1. If you allow Self-Registration, where new Users can set up their own User Name on your WordPress site or Network, you will want to select **Reveal User Registration Page** on the plugin's Settings page.
 
 == Changelog ==
+
+= 2.1 =
+* Add a settings checkbox to reveal the Register page for User Self-Registration
 
 = 2.0 =
 * Add Settings page, specifying Landing Location and turning Private Site off and on
@@ -50,6 +56,9 @@ This section describes how to install the plugin and get it working.
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.1 =
+Allow User Self-Registration by "revealing" the Register page to those not logged in.
 
 = 2.0 =
 Create a Settings page that defines where the user ends up after logging in

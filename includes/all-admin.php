@@ -17,8 +17,9 @@ if ( isset( $internal_settings['warning_privacy'] ) ) {
 	*
 	*/
 	function jr_ps_warning_privacy() {
+		global $jr_ps_plugin_data;
 		if ( current_user_can( 'manage_options' ) ) {
-			echo '<div class="updated"><p><b>Private Site is currently turned off on plugin <a href="'
+			echo '<div class="updated"><p><b>Private Site is currently turned off on ' . $jr_ps_plugin_data['Name'] . ' plugin <a href="'
 				. admin_url( 'options-general.php?page=jr_ps_settings' )
 				. '">Settings page</a>.</b></p></div>';
 		}
