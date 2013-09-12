@@ -32,7 +32,7 @@ This section describes how to install the *jonradio Private Site* plugin and get
 
 1. Use **Add Plugin** within the WordPress Admin panel to download and install this *jonradio Private Site* plugin from the WordPress.org plugin repository (preferred method).  Or download and unzip this plugin, then upload the `/jonradio-private-site/` directory to your WordPress web site's `/wp-content/plugins/` directory
 1. Activate the *jonradio Private Site* plugin through the **Installed Plugins** Admin panel in WordPress.  If you have a WordPress Network ("Multisite"), you can either **Network Activate** this plugin, or Activate it individually on the sites where you wish to use it.
-1. Go to the plugin's Settings page to make the Site **Private*, and set where the user ends up after logging in: the **Landing Location**.
+1. Go to the plugin's Settings page to make the Site **Private**, and set where the user ends up after logging in: the **Landing Location**.
 1. If you allow Self-Registration, where new Users can set up their own User Name on your WordPress site or Network, you will want to select **Reveal User Registration Page** on the plugin's Settings page.
 
 == Changelog ==
