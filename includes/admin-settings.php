@@ -22,6 +22,7 @@ function jr_ps_admin_hook() {
 	//  Add Settings Page for this Plugin
 	global $jr_ps_plugin_data;
 	add_options_page( $jr_ps_plugin_data['Name'], 'Private Site', 'manage_options', 'jr_ps_settings', 'jr_ps_settings_page' );
+	add_users_page( $jr_ps_plugin_data['Name'], 'Private Site', 'add_users', 'jr_ps_settings', 'jr_ps_settings_page' );
 }
 
 /**
@@ -105,6 +106,26 @@ function jr_ps_admin_init() {
 		'jr_ps_self_registration_expl', 
 		'jr_ps_settings_page' 
 	);
+	if ( is_multisite() ) {
+		/*	Clone Network Admin panels:  Settings-Network Settings-Registration Settings-Allow new registrations.
+			It will be Read-Only except for Super Administrators.
+		*/
+		add_settings_field( 'registrations', 
+			'Allow new registrations', 
+			'jr_ps_echo_registrations', 
+			'jr_ps_settings_page', 
+			'jr_ps_self_registration_section' 
+		);
+	} else {
+		/*	Clone Site Admin panels:  Settings-General Settings-Membership
+		*/
+		add_settings_field( 'membership', 
+			'Membership', 
+			'jr_ps_echo_membership', 
+			'jr_ps_settings_page', 
+			'jr_ps_self_registration_section' 
+		);
+	}
 	add_settings_field( 'reveal_registration', 
 		'Reveal User Registration Page', 
 		'jr_ps_echo_reveal_registration', 
@@ -148,11 +169,8 @@ function jr_ps_private_settings_expl() {
 
 function jr_ps_echo_private_site() {
 	$settings = get_option( 'jr_ps_settings' );
-	echo '<input type="checkbox" id="private_site" name="jr_ps_settings[private_site]" value="true"';
-	if ( $settings['private_site'] ) {
-		echo ' checked="checked"';
-	}
-	echo ' />';
+	echo '<input type="checkbox" id="private_site" name="jr_ps_settings[private_site]" value="true"'
+		. checked( TRUE, $settings['private_site'], FALSE ) . ' />';
 }
 
 /**
@@ -162,24 +180,67 @@ function jr_ps_echo_private_site() {
  *
  */
 function jr_ps_self_registration_expl() {
-	?>
+	echo '
 	<p>
-	If you want Users to be able to Register themselves,
-	please check the checkbox below
-	or the Registration page will be blocked by this plugin
-	when you select Private Site above.
-	(You must also select <b>Membership</b> in <b>General Settings</b> or, for Multi-Site, <b>Allow New Registrations</b> in <b>Network Settings</b>)
+	If you want Users to be able to Register themselves on a Private Site,
+	there are two Settings involved.
+	First
+	is the WordPress Setting that actually allows new Users to self-register.
+	It is shown here as a convenience,
+	but:
+	<ol>
+	<li>This is the same
+	';
+	if ( is_multisite() ) {
+		echo '<b>Allow New Registrations</b> field displayed on the <b>Network Settings</b> Admin panel;</li>';
+	} else {
+		echo '<b>Membership</b> field displayed on the <b>General Settings</b> Admin panel;</li>';
+	}
+	if ( is_multisite() && !is_super_admin() ) {
+		echo '<li>The field is greyed out below because only Super Administrators can change this field.';
+	} else {
+		echo '<li>Clicking the Save Changes button will update its value.';
+	}
+	echo '
+	</li>
+	</ol>
 	</p>
-	<?php
+	<p>
+	Second, is a Setting
+	(Reveal User Registration Page)
+	for this plugin,
+	to make the WordPress Registration page visible to Visitors who are not logged on.
+	Since Users cannot log on until they are Registered,
+	this Setting must be selected (check mark) for Self-Registration.
+	</p>
+	';
 }
 
 function jr_ps_echo_reveal_registration() {
 	$settings = get_option( 'jr_ps_settings' );
-	echo '<input type="checkbox" id="reveal_registration" name="jr_ps_settings[reveal_registration]" value="true"';
-	if ( $settings['reveal_registration'] ) {
-		echo ' checked="checked"';
+	echo '<input type="checkbox" id="reveal_registration" name="jr_ps_settings[reveal_registration]" value="true"'
+		. checked( TRUE, $settings['reveal_registration'], FALSE ) . ' />';
+}
+
+function jr_ps_echo_registrations() {
+	$setting = get_site_option( 'registration' );
+	foreach ( array( 
+		'none' => 'Registration is disabled.',
+		'user' => 'User accounts may be registered.',
+		'blog' => 'Logged in users may register new sites.',
+		'all'  => 'Both sites and user accounts can be registered.'
+		) as $value => $description ) {
+		echo '<input type="radio" id="registrations" name="jr_ps_settings[registrations]" '
+			. checked( $value, $setting, FALSE )
+			. ' value="' . $value . '" '
+			. disabled( is_super_admin(), FALSE, FALSE )
+			. ' /> ' . $description . '<br />';
 	}
-	echo ' />';
+}
+
+function jr_ps_echo_membership() {
+	echo '<input type="checkbox" id="membership" name="jr_ps_settings[membership]" value="1"'
+		. checked( '1', get_option( 'users_can_register' ), FALSE ) . ' /> Anyone can register';
 }
 
 /**
@@ -218,11 +279,9 @@ function jr_ps_echo_landing() {
 		} else {
 			echo '<br />';
 		}
-		echo '<input type="radio" id="landing" name="jr_ps_settings[landing]" ';
-		if ( $settings['landing'] == $val ) {
-			echo 'checked="checked"';
-		}
-		echo ' value="' . $val . '" /> ' . $desc;
+		echo '<input type="radio" id="landing" name="jr_ps_settings[landing]" '
+			. checked( $val, $settings['landing'], FALSE )
+			. ' value="' . $val . '" /> ' . $desc;
 	}
 }
 
@@ -236,13 +295,13 @@ function jr_ps_validate_settings( $input ) {
 	$valid = array();
 	$settings = get_option( 'jr_ps_settings' );
 	
-	if ( array_key_exists( 'private_site', $input ) && ( $input['private_site'] === 'true' ) ) {
+	if ( isset( $input['private_site'] ) && ( $input['private_site'] === 'true' ) ) {
 		$valid['private_site'] = TRUE;
 	} else {
 		$valid['private_site'] = FALSE;
 	}
 	
-	if ( array_key_exists( 'reveal_registration', $input ) && ( $input['reveal_registration'] === 'true' ) ) {
+	if ( isset( $input['reveal_registration'] ) && ( $input['reveal_registration'] === 'true' ) ) {
 		$valid['reveal_registration'] = TRUE;
 	} else {
 		$valid['reveal_registration'] = FALSE;
@@ -255,7 +314,7 @@ function jr_ps_validate_settings( $input ) {
 			/*	If URL is input without http:// or https://, then add it based on the Site URL.
 			*/
 			$parse_url = parse_url( $input['specific_url'] );
-			if ( is_array( $parse_url ) && array_key_exists( 'scheme', $parse_url ) && in_array( strtolower( $parse_url['scheme'] ), array( 'http', 'https' ) ) ) {
+			if ( isset( $parse_url['scheme'] ) && in_array( strtolower( $parse_url['scheme'] ), array( 'http', 'https' ) ) ) {
 				$url = $input['specific_url'];
 			} else {
 				$parse_url = parse_url( get_home_url() );
@@ -284,6 +343,21 @@ function jr_ps_validate_settings( $input ) {
 				'error'
 			);
 		}
+	}
+	
+	if ( is_multisite() ) {
+		if ( is_super_admin() ) {
+			if ( isset( $input['registrations'] ) ) {
+				update_site_option( 'registration', $input['registrations'] );
+			}	
+		}
+	} else {
+		if ( isset( $input['membership'] ) ) {
+			$mem = $input['membership'];
+		} else {
+			$mem = '0';
+		}
+		update_option( 'users_can_register', $mem );
 	}
 	
 	return $valid;

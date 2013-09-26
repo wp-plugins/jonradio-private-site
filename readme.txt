@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 2.1
+Stable tag: 2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Allows the Administrator to restrict a WordPress-based web site to viewing only 
 
 Any attempt to view any Page, Post or other part of the site will see anyone not logged on greeted by a WordPress login screen.  A Settings Page allows the Administrator to determine where Users will be automatically directed to each time that they login, a "Landing Location".
 
-If you allow Self-Registration, where new Users can Register themselves, you will need to select the "Reveal User Registration Page" setting or new Users will be blocked from seeing the WordPress Registration screen.
+If you allow Self-Registration, where new Users can Register themselves, you will need to select the "Reveal User Registration Page" setting or new Users will be blocked from seeing the WordPress Registration screen.  For convenience, the WordPress Setting that controls Self-Registration of Users has been added to the Plugin's Settings page.
 
 Another Setting allows the Private Site feature to be turned off.  When the plugin is installed and activated, the Private Site feature is set off by default, to allow the Administrator an opportunity to become familiarized with the plugin's features and to set the desired settings.  A warning that the site is not private appears after first activation of the plugin until the Administrator visits the plugin's Settings page.
 
@@ -37,6 +37,10 @@ This section describes how to install the *jonradio Private Site* plugin and get
 
 == Changelog ==
 
+= 2.2 =
+* Add the WordPress User Self-Registration field to the plugin's Settings page
+* Add the Settings page to the User submenu of Admin panel, too
+
 = 2.1 =
 * Add a settings checkbox to reveal the Register page for User Self-Registration
 
@@ -56,6 +60,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.2 =
+Display WordPress Self-Registration field on plugin Settings page.
 
 = 2.1 =
 Allow User Self-Registration by "revealing" the Register page to those not logged in.
