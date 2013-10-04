@@ -21,8 +21,8 @@ add_action( 'admin_menu', 'jr_ps_admin_hook' );
 function jr_ps_admin_hook() {
 	//  Add Settings Page for this Plugin
 	global $jr_ps_plugin_data;
-	add_options_page( $jr_ps_plugin_data['Name'], 'Private Site', 'manage_options', 'jr_ps_settings', 'jr_ps_settings_page' );
 	add_users_page( $jr_ps_plugin_data['Name'], 'Private Site', 'add_users', 'jr_ps_settings', 'jr_ps_settings_page' );
+	add_options_page( $jr_ps_plugin_data['Name'], 'Private Site', 'manage_options', 'jr_ps_settings', 'jr_ps_settings_page' );
 }
 
 /**
@@ -36,7 +36,12 @@ function jr_ps_settings_page() {
 	add_thickbox();
 	echo '<div class="wrap">';
 	screen_icon( 'plugins' );
-	echo '<h2>' . $jr_ps_plugin_data['Name'] . '</h2><h3>Overview</h3><p>';
+	echo '<h2>' . $jr_ps_plugin_data['Name'] . '</h2>';
+	
+	//	Required because it is only called automatically for Admin Pages in the Settings section
+	settings_errors( 'jr_ps_settings' );
+	
+	echo '<h3>Overview</h3><p>';
 	$settings = get_option( 'jr_ps_settings' );
 	if ( $settings['private_site'] ) {
 		echo 'This';
@@ -148,6 +153,17 @@ function jr_ps_admin_init() {
 		'jr_ps_echo_specific_url', 
 		'jr_ps_settings_page', 
 		'jr_ps_landing_settings_section' 
+	);
+	add_settings_section( 'jr_ps_exclusions_section', 
+		'Visible Exclusions', 
+		'jr_ps_exclusions_expl', 
+		'jr_ps_settings_page' 
+	);
+	add_settings_field( 'excl_home', 
+		'Site Home Always Visible?', 
+		'jr_ps_echo_excl_home', 
+		'jr_ps_settings_page', 
+		'jr_ps_exclusions_section' 
 	);
 }
 
@@ -291,6 +307,22 @@ function jr_ps_echo_specific_url() {
 	echo esc_url( $settings['specific_url'] ) . '" />';
 }
 
+function jr_ps_exclusions_expl() {
+	?>
+	<p>
+	If you want to use your Site Home to interest visitors in registering for your site so they can see the rest of your site,
+	you obviously need Site Home visible to everyone.
+	</p>
+	<?php
+}
+
+function jr_ps_echo_excl_home() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="excl_home" name="jr_ps_settings[excl_home]" value="true"'
+		. checked( TRUE, $settings['excl_home'], FALSE ) . ' /> Site Home is visible to everyone?';
+	echo '<br />(' . get_home_url() . ')';
+}
+
 function jr_ps_validate_settings( $input ) {
 	$valid = array();
 	$settings = get_option( 'jr_ps_settings' );
@@ -306,8 +338,6 @@ function jr_ps_validate_settings( $input ) {
 	} else {
 		$valid['reveal_registration'] = FALSE;
 	}
-	
-	$valid['landing'] = $input['landing'];
 	
 	if ( trim( $input['specific_url'] ) ) {
 		if ( jr_ps_site_url( $input['specific_url'] ) ) {
@@ -335,14 +365,38 @@ function jr_ps_validate_settings( $input ) {
 		}
 	} else {
 		$valid['specific_url'] = '';
-		if ( 'url' === $input['landing'] ) {
+	}
+	
+	if ( 'url' === $input['landing'] ) {
+		if ( '' === $valid['specific_url'] ) {
 			add_settings_error(
 				'jr_ps_settings',
 				'jr_ps_nourlerror',
-				'Error in Landing Location: <i>Go to Specific URL</i> selected but no URL specified.',
+				'Error in Landing Location: <i>Go to Specific URL</i> selected but no URL specified.  Set to default <i>Return to same URL</i>.',
 				'error'
 			);
+			$valid['landing'] = 'return';
+		} else {
+			$valid['landing'] = 'url';
 		}
+	} else {
+		if ( '' !== $valid['specific_url'] ) {
+			add_settings_error(
+				'jr_ps_settings',
+				'jr_ps_nourlerror',
+				'Error in Landing Location:  URL specified when not valid.  URL deleted.',
+				'error'
+			);
+			$valid['specific_url'] = '';
+		}
+		$valid['landing'] = $input['landing'];
+	}
+	
+	
+	if ( isset( $input['excl_home'] ) && ( $input['excl_home'] === 'true' ) ) {
+		$valid['excl_home'] = TRUE;
+	} else {
+		$valid['excl_home'] = FALSE;
 	}
 	
 	if ( is_multisite() ) {
@@ -359,6 +413,16 @@ function jr_ps_validate_settings( $input ) {
 		}
 		update_option( 'users_can_register', $mem );
 	}
+	
+	$errors = get_settings_errors();
+	if ( empty( $errors ) ) {
+		add_settings_error(
+			'jr_ps_settings',
+			'jr_ps_saved',
+			'Settings Saved',
+			'updated'
+		);	
+	}	
 	
 	return $valid;
 }

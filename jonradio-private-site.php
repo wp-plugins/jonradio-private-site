@@ -3,7 +3,7 @@
 Plugin Name: jonradio Private Site
 Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
 Description: Creates a Private Site by allowing only those logged on to view the WordPress web site.  Settings select the initial destination after login.
-Version: 2.2
+Version: 2.3
 Author: jonradio
 Author URI: http://jonradio.com/plugins
 License: GPLv2
@@ -94,7 +94,8 @@ if ( empty( $settings ) ) {
 		'private_site'        => FALSE,
 		'reveal_registration' => FALSE,
 		'landing'             => 'return',
-		'specific_url'        => ''
+		'specific_url'        => '',
+		'excl_home'           => FALSE
 	);
 	/*	Add if Settings don't exist, re-initialize if they were empty.
 	*/
@@ -122,9 +123,13 @@ if ( version_compare( $old_version, $jr_ps_plugin_data['Version'], '!=' ) ) {
 	if ( version_compare( $old_version, '2.1', '<' ) ) {
 		$settings['reveal_registration'] = FALSE;
 	}
+	if ( version_compare( $old_version, '2.3', '<' ) ) {
+		$settings['excl_home'] = FALSE;
+	}
 	update_option( 'jr_ps_settings', $settings );
 }
 
+require_once( jr_ps_path() . 'includes/common-functions.php' );
 if ( is_admin() ) {
 	require_once( jr_ps_path() . 'includes/all-admin.php' );
 	/* 	Support WordPress Version 3.0.x before is_network_admin() existed
@@ -143,24 +148,54 @@ if ( is_admin() ) {
 	//	All changes to all Admin-Installed Plugins pages
 	require_once( jr_ps_path() . 'includes/installed-plugins.php' );
 } else {
-	//	Public WordPress content, i.e. - not Admin pages
-	$reveal = FALSE;
-	if ( ( TRUE === $settings['private_site'] ) && ( TRUE === $settings['reveal_registration'] ) ) {
-		function jr_ps_match_register( $reg_url ) {
-			return ( 0 === strcasecmp( $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'], substr( $reg_url, 3 + strpos( $reg_url, '://' ) ) ) );
-		}
-		if ( jr_ps_match_register( wp_registration_url() ) ) {
-			$reveal = TRUE;
-		} else {
-			if ( is_multisite() && jr_ps_match_register( get_site_url( 0, 'wp-signup.php' ) ) ) {
-				$reveal = TRUE;
-			}
-		}
-	}
-	if ( FALSE === $reveal ) {	
+	/*	Public WordPress content, i.e. - not Admin pages
+		Do nothing if Private Site setting not set by Administrator
+	*/
+	if ( $settings['private_site'] ) {
 		//	Private Site code
 		require_once( jr_ps_path() . 'includes/public.php' );
 	}
 }
+
+/*	Documentation of Research Done for this Plugin:
+	Registration URL (based on a root install in http://localhost):
+	WordPress 3.6.1 without jonradio Private Site installed
+	Single Site - not a network
+		http://localhost/wp-login.php?action=register
+	Primary Site of a Network
+		http://localhost/wp-signup.php
+	Secondary Site of a Network
+		http://localhost/wp-signup.php
+	This last URL needs a lot of thought because it means that what begins on one site ends up on another.
+
+	WordPress 3.7-beta without jonradio Private Site installed
+	Single Site - not a network
+		http://localhost/wp-login.php?action=register
+	Primary Site of a Network
+		http://localhost/wp-signup.php
+	Secondary Site of a Network
+		http://localhost/wp-signup.php
+	
+	WordPress 3.0.0 without jonradio Private Site installed
+	Single Site - not a network
+		http://localhost/wp-login.php?action=register
+	Primary Site of a Network
+		http://localhost/wp-signup.php
+	Secondary Site of a Network
+		http://localhost/wp-signup.php
+	
+	wp_registration_url() was not available prior to WordPress Version 3.6.0
+	
+	Self-Registration allows potential Users to Register their own ID and Password without Administrator intervention or knowledge.
+	It is controlled by:
+		get_option( 'users_can_register' ) - non-Network
+			'1' - allows Self-Registration
+			'0' - no Self-Registration
+		get_site_option( 'registration' ) - Network (Multisite)
+			'user' - allows Self-Registration
+			'none' - no Self-Registration
+			'blog' - Users can create new Sites in a Network
+			'all' - allows Self-Registration and the creation of new Sites in a Network
+*/
 
 ?>

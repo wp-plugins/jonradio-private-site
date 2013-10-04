@@ -32,33 +32,62 @@ function jr_ps_login() {
  */
 function jr_ps_force_login() {
 	global $jr_ps_is_login;
-	if ( !is_user_logged_in() && !isset( $jr_ps_is_login ) ) {
-		$settings = get_option( 'jr_ps_settings' );
-		switch ( $settings['landing'] ) {
-			case 'return':
-				//	$_SERVER['HTTPS'] can be off in IIS
-				if ( empty( $_SERVER['HTTPS'] ) || ( $_SERVER['HTTPS'] == 'off' ) ) {
-					$http = 'http://';
-				} else {
-					$http = 'https://';
-				}
-				$after_login_url = $http . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-				break;
-			case 'home':
-				$after_login_url = get_home_url();
-				break;
-			case 'admin':
-				$after_login_url = get_admin_url();
-				break;
-			case 'url':
-				$after_login_url = trim( $settings['specific_url'] );
-				break;
+	if ( is_user_logged_in() || isset( $jr_ps_is_login ) ) {
+		return;
+	}
+	
+	$settings = get_option( 'jr_ps_settings' );
+	/*	URL of current page without http://, i.e. - starting with domain
+	*/
+	$current_url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+	if ( $settings['excl_home'] && jr_v1_same_url( get_home_url(), $current_url ) ) {
+		return;
+	}
+	
+	if ( $settings['reveal_registration'] ) {
+		/*	URL of Registration Page varies between Multisite (Network)
+			and Single Site WordPress.
+			Plus, wp_registration_url function was introduced in
+			WordPress Version 3.6.
+		*/
+		if ( is_multisite() ) {
+			$reg_url = get_site_url( 0, 'wp-signup.php' );
+		} else {
+			if ( function_exists( 'wp_registration_url' ) ) {
+				$reg_url = wp_registration_url();
+			} else {
+				$reg_url = get_site_url( 0, 'wp-login.php?action=register' );
+			}
+		}	
+		if ( jr_v1_same_url( $reg_url, $current_url ) ) {
+			return;
 		}
-		//	Avoid situations where specific URL is requested, but URL is blank
-		if ( !empty( $after_login_url ) ) {
-			wp_redirect( wp_login_url( $after_login_url ) );
-			exit;
-		}
+	}
+
+	switch ( $settings['landing'] ) {
+		case 'return':
+			//	$_SERVER['HTTPS'] can be off in IIS
+			if ( empty( $_SERVER['HTTPS'] ) || ( $_SERVER['HTTPS'] == 'off' ) ) {
+				$http = 'http://';
+			} else {
+				$http = 'https://';
+			}
+			$after_login_url = $http . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+			break;
+		case 'home':
+			$after_login_url = get_home_url();
+			break;
+		case 'admin':
+			$after_login_url = get_admin_url();
+			break;
+		case 'url':
+			$after_login_url = trim( $settings['specific_url'] );
+			break;
+	}
+	//	Avoid situations where specific URL is requested, but URL is blank
+	if ( !empty( $after_login_url ) ) {
+		wp_redirect( wp_login_url( $after_login_url ) );
+		exit;
 	}
 }
 
