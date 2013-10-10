@@ -45,6 +45,8 @@ function jr_ps_force_login() {
 	}
 	
 	if ( $settings['reveal_registration'] ) {
+		$buddypress_path = 'buddypress/bp-loader.php';
+		$buddypress_active = is_plugin_active( $buddypress_path );
 		/*	URL of Registration Page varies between Multisite (Network)
 			and Single Site WordPress.
 			Plus, wp_registration_url function was introduced in
@@ -52,14 +54,19 @@ function jr_ps_force_login() {
 		*/
 		if ( is_multisite() ) {
 			$reg_url = get_site_url( 0, 'wp-signup.php' );
+			$buddypress_active = $buddypress_active || is_plugin_active_for_network( $buddypress_path );
 		} else {
 			if ( function_exists( 'wp_registration_url' ) ) {
 				$reg_url = wp_registration_url();
 			} else {
 				$reg_url = get_site_url( 0, 'wp-login.php?action=register' );
 			}
-		}	
-		if ( jr_v1_same_url( $reg_url, $current_url ) ) {
+		}
+		if ( jr_v1_same_url( $reg_url, $current_url )
+			|| ( $buddypress_active && jr_v1_same_url( get_site_url( 0, 'register' ), $current_url ) ) ) {
+			/*	BuddyPress plugin redirects Registration URL to
+				either {current site}/register/ or {main site}/register/
+			*/
 			return;
 		}
 	}

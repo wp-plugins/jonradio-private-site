@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.7
-Stable tag: 2.3
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ If you allow Self-Registration, where new Users can Register themselves, you wil
 
 Another Setting allows the Private Site feature to be turned off.  When the plugin is installed and activated, the Private Site feature is set off by default, to allow the Administrator an opportunity to become familiarized with the plugin's features and to set the desired settings.  A warning that the site is not private appears after first activation of the plugin until the Administrator visits the plugin's Settings page.
 
-There is also a Setting to make the Home Page visible on a Private Site
+There is also a Setting to make the Home Page visible on a Private Site.
 
 If a WordPress Network is defined, the plugin can be activated individually for select sites.  Or Network Activated.  In either case, each site will have its own Settings page where the Private Site feature can be turned off (default) or on for just the one site, and a Landing Location defined for each site.
 
@@ -38,6 +38,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 1. If you allow Self-Registration, where new Users can set up their own User Name on your WordPress site or Network, you will want to select **Reveal User Registration Page** on the plugin's Settings page.
 
 == Changelog ==
+
+= 2.4 =
+* Handle BuddyPress' redirection of Register URL in Reveal Registration
 
 = 2.3 =
 * Add Setting to Reveal Home Page on a Private Site
@@ -66,6 +69,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.4 =
+Support BuddyPress
 
 = 2.3 =
 New Setting to display Home Page on a Private Site.
