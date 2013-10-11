@@ -112,6 +112,11 @@ if ( !function_exists( 'jr_v1_prep_url' ) ) {
 			/*	Remove leading and trailing slashes from path
 			*/
 			$parse_array['path'] = trim( $parse_array['path'], "/\\" );
+			/*	Remove an empty Path component, or it won't array-match
+			*/
+			if ( empty( $parse_array['path'] ) ) {
+				unset( $parse_array['path'] );
+			}
 		}
 		/*	Take /?keyword=value&keyword=value URL query parameters
 			and break them up into array( keyword => value, keyword => value )
