@@ -3,8 +3,8 @@ Contributors: jonradio
 Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
-Tested up to: 3.7
-Stable tag: 2.4.1
+Tested up to: 3.7.1
+Stable tag: 2.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 
 == Changelog ==
 
+= 2.4.2 =
+* Reveal BuddyPress /activate/ Activation page when Reveal Registration selected
+
 = 2.4.1 =
 * Fix bug in URL matching for Root, where one URL has a trailing slash and the other does not
 
@@ -72,6 +75,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.4 =
+Reveal BuddyPress Activation page
 
 = 2.4.1 =
 Home Page better URL matching for Root Home Pages

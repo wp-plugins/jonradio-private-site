@@ -63,9 +63,14 @@ function jr_ps_force_login() {
 			}
 		}
 		if ( jr_v1_same_url( $reg_url, $current_url )
-			|| ( $buddypress_active && jr_v1_same_url( get_site_url( 0, 'register' ), $current_url ) ) ) {
+			|| ( $buddypress_active 
+				&& ( jr_v1_same_url( get_site_url( 0, 'register' ), $current_url )
+					|| jr_v1_same_url( get_site_url( 0, 'activate' ),
+						parse_url( $current_url, PHP_URL_HOST )
+						. parse_url( $current_url, PHP_URL_PATH ) ) ) ) ) {
 			/*	BuddyPress plugin redirects Registration URL to
 				either {current site}/register/ or {main site}/register/
+				and has its own Activation at /activate/?key=...
 			*/
 			return;
 		}
