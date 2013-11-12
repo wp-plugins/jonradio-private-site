@@ -43,6 +43,15 @@ function jr_ps_force_login() {
 	if ( $settings['excl_home'] && jr_v1_same_url( get_home_url(), $current_url ) ) {
 		return;
 	}
+	if ( isset( $settings['excl_url'] ) ) {
+		foreach ( $settings['excl_url'] as $arr ) {
+			/*	Test the pre-parsed URL in the URL Exclusion list
+			*/
+			if ( jr_v1_same_url( $arr[1], $current_url ) ) {
+				return;
+			}
+		}
+	}
 	
 	if ( $settings['reveal_registration'] ) {
 		$buddypress_path = 'buddypress/bp-loader.php';

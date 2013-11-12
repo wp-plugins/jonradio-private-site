@@ -133,4 +133,52 @@ if ( !function_exists( 'jr_v1_prep_url' ) ) {
 	}
 }
 
+/**
+ * Sanitize a URL
+ * 
+ * Preps URL, by removing any UTF Left-to-right Mark (LRM), usually found as a suffix, 
+ * and then checks if URL is blank.
+ *
+ * @param    string  $url	URL
+ * @return   string/bool	Sanitized URL; bool FALSE if invalid URL;
+ *							zero length string if URL not specified
+ */
+if ( !function_exists( 'jr_v1_sanitize_url' ) ) {
+	function jr_v1_sanitize_url( $url ) {
+		/*	Handle troublesome %E2%80%8E UTF Left-to-right Mark (LRM) suffix first.
+		*/
+		if ( FALSE === stripos( $url, '%E2%80%8E' ) ) {
+			if ( FALSE === stripos( rawurlencode( $url ), '%E2%80%8E' ) ) {
+				$url_clean = $url;
+			} else {
+				$url_clean = rawurldecode( str_ireplace( '%E2%80%8E', '', rawurlencode( $url ) ) );
+			}
+		} else {
+			$url_clean = str_ireplace( '%E2%80%8E', '', $url );
+		}
+		$url_clean = trim( $url_clean );
+		if ( empty( $url_clean ) ) {
+			return '';
+		}
+		/*	Add a prefix of http:// if :// is not found
+			and be sure scheme is http: or https:
+		*/
+		if ( FALSE === strpos( $url_clean, '://' ) ) {
+			if ( is_ssl()
+				|| ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) 
+					&& $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) ) {
+				$s = 's';
+			} else {
+				$s = '';
+			}
+			$url_clean = "http$s://$url_clean";
+		} else {
+			if ( !in_array( strtolower( parse_url( $url_clean, PHP_URL_SCHEME ) ), array( 'http', 'https' ) ) ) {
+				return FALSE;
+			}
+		}
+		return $url_clean;
+	}
+}
+
 ?>

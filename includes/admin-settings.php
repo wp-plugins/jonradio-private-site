@@ -54,12 +54,25 @@ function jr_ps_settings_page() {
 	before viewing your web site.
 	The only things visible to anyone not logged in, including Search Engines, are:
 	<ul>
-	<li> &raquo; Your site's WordPress Login page;</li>
-	<li> &raquo; Any non-WordPress components of your web site, such as HTML, PHP, ASP or other non-WordPress web page files;</li>
-	<li> &raquo; Images and other media and text files, but only when accessed directly by their URL, 
-	or from a browser's directory view, if available.</li> 
+	<li>
+	&raquo; Your site's WordPress Login page;
+	</li>
+	<li>
+	&raquo; Any selections in the 
+	<b>
+	Visible Exclusions 
+	</b>
+	section (below);
+	</li>
+	<li>
+	&raquo; Any non-WordPress components of your web site, such as HTML, PHP, ASP or other non-WordPress web page files;
+	</li>
+	<li>
+	&raquo; Images and other media and text files, but only when accessed directly by their URL, 
+	or from a browser's directory view, if available.
+	</li>
 	</ul>
-	Other means are available to hide most, if not all, of the files mentioned above.
+	Other means are available to hide most of the files mentioned above.
 	</p>
 	<p>
 	To see your site, each visitor will need to be registered as a User on your WordPress site.
@@ -165,6 +178,21 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_exclusions_section' 
 	);
+	add_settings_field( 'excl_url_add', 
+		'Add URL to be Always Visible', 
+		'jr_ps_echo_excl_url_add', 
+		'jr_ps_settings_page', 
+		'jr_ps_exclusions_section' 
+	);
+	$settings = get_option( 'jr_ps_settings' );
+	if ( !empty( $settings['excl_url'] ) ) {
+		add_settings_field( 'excl_url_del', 
+			'Current Visible URL Entries', 
+			'jr_ps_echo_excl_url_del', 
+			'jr_ps_settings_page', 
+			'jr_ps_exclusions_section' 
+		);		
+	}
 }
 
 /**
@@ -304,7 +332,15 @@ function jr_ps_echo_landing() {
 function jr_ps_echo_specific_url() {
 	$settings = get_option( 'jr_ps_settings' );
 	echo '<input type="text" id="specific_url" name="jr_ps_settings[specific_url]" size="100" maxlength="256" value="';
-	echo esc_url( $settings['specific_url'] ) . '" />';
+	echo esc_url( $settings['specific_url'] ) 
+		. '" />
+			<br />
+			(cut and paste URL here of Page, Post or other)
+			<br />
+			URL must begin with
+			<code>' 
+		. trim( get_home_url(), '\ /' ) 
+		. '/</code>';
 }
 
 function jr_ps_exclusions_expl() {
@@ -312,6 +348,13 @@ function jr_ps_exclusions_expl() {
 	<p>
 	If you want to use your Site Home to interest visitors in registering for your site so they can see the rest of your site,
 	you obviously need Site Home visible to everyone.
+	You can add additional Visible site URLs,
+	one entry at a time,
+	in the 
+	<b>
+	Add URL to be Always Visible 
+	</b>
+	field.
 	</p>
 	<?php
 }
@@ -321,6 +364,26 @@ function jr_ps_echo_excl_home() {
 	echo '<input type="checkbox" id="excl_home" name="jr_ps_settings[excl_home]" value="true"'
 		. checked( TRUE, $settings['excl_home'], FALSE ) . ' /> Site Home is visible to everyone?';
 	echo '<br />(' . get_home_url() . ')';
+}
+
+function jr_ps_echo_excl_url_add() {
+	?>
+	<input id="excl_url_add" name="jr_ps_settings[excl_url_add]" type="text" size="100" maxlength="256" value="" />
+	<br />
+	(cut and paste URL here of Page, Post or other)
+	<br />
+	URL must begin with
+	<?php
+	echo '<code>' . trim( get_home_url(), '\ /' ) . '/</code>';
+}
+
+function jr_ps_echo_excl_url_del() {
+	$settings = get_option( 'jr_ps_settings' );
+	foreach ( $settings['excl_url'] as $index => $arr ) {
+		$display_url = $arr[0];
+		echo "Delete <input type='checkbox' id='excl_url_del' name='jr_ps_settings[excl_url_del][]' value='$index' />"
+			. " <a href='$display_url' target='_blank'>$display_url</a><br />";
+	}
 }
 
 function jr_ps_validate_settings( $input ) {
@@ -339,33 +402,35 @@ function jr_ps_validate_settings( $input ) {
 		$valid['reveal_registration'] = FALSE;
 	}
 	
-	if ( trim( $input['specific_url'] ) ) {
-		if ( jr_ps_site_url( $input['specific_url'] ) ) {
-			/*	If URL is input without http:// or https://, then add it based on the Site URL.
-			*/
-			$parse_url = parse_url( $input['specific_url'] );
-			if ( isset( $parse_url['scheme'] ) && in_array( strtolower( $parse_url['scheme'] ), array( 'http', 'https' ) ) ) {
-				$url = $input['specific_url'];
-			} else {
-				$parse_url = parse_url( get_home_url() );
-				$url = $parse_url['scheme'] . '://' . $input['specific_url'];
-			}
-			$valid['specific_url'] = esc_url_raw( $url, array( 'http', 'https' ) );
-		} else {
+	$url = jr_v1_sanitize_url( $input['specific_url'] );
+	if ( '' !== $url ) {
+		if ( FALSE === $url ) {
 			/*	Reset to previous URL value and generate an error message.
 			*/
-			$valid['specific_url'] = $settings['specific_url'];
+			$url = $settings['specific_url'];			
 			add_settings_error(
 				'jr_ps_settings',
 				'jr_ps_urlerror',
-				'Error in URL.  It must point to someplace on this WordPress web site<br /><code>'
+				'Landing Location URL is not a valid URL<br /><code>'
 					. sanitize_text_field( $input['specific_url'] ) . '</code>',
 				'error'
 			);
+		} else {
+			if ( !jr_ps_site_url( $url ) ) {
+				/*	Reset to previous URL value and generate an error message.
+				*/
+				$url = $settings['specific_url'];
+				add_settings_error(
+					'jr_ps_settings',
+					'jr_ps_urlerror',
+					'Error in Landing Location URL.  It must point to someplace on this WordPress web site<br /><code>'
+						. sanitize_text_field( $input['specific_url'] ) . '</code>',
+					'error'
+				);
+			}
 		}
-	} else {
-		$valid['specific_url'] = '';
 	}
+	$valid['specific_url'] = $url;
 	
 	if ( 'url' === $input['landing'] ) {
 		if ( '' === $valid['specific_url'] ) {
@@ -412,6 +477,46 @@ function jr_ps_validate_settings( $input ) {
 			$mem = '0';
 		}
 		update_option( 'users_can_register', $mem );
+	}
+	
+	if ( isset( $settings['excl_url'] ) ) {
+		$valid['excl_url'] = $settings['excl_url'];
+	} else {
+		$valid['excl_url'] = array();
+	}
+	/*	Delete URLs to Exclude from Privacy.
+	*/
+	if ( isset ( $input['excl_url_del'] ) ) {
+		foreach ( $input['excl_url_del'] as $excl_url_del ) {
+			unset( $valid['excl_url'][$excl_url_del] );
+		}
+	}
+
+	/*	Add a URL to Exclude from Privacy.
+	*/
+	$url = jr_v1_sanitize_url( $input['excl_url_add'] );
+	if ( '' !== $url ) {
+		if ( FALSE === $url ) {
+			add_settings_error(
+				'jr_ps_settings',
+				'jr_ps_urlerror',
+				'Always Visible URL is not a valid URL<br /><code>'
+					. sanitize_text_field( $input['excl_url_add'] ) . '</code>',
+				'error'
+			);
+		} else {
+			if ( jr_ps_site_url( $url ) ) {
+				$valid['excl_url'][] = array( $url, jr_v1_prep_url( $url ) );
+			} else {
+				add_settings_error(
+					'jr_ps_settings',
+					'jr_ps_urlerror',
+					'Error in Always Visible URL.  It must point to someplace on this WordPress web site<br /><code>'
+						. sanitize_text_field( $input['excl_url_add'] ) . '</code>',
+					'error'
+				);
+			}
+		}
 	}
 	
 	$errors = get_settings_errors();
