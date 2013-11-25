@@ -93,7 +93,9 @@ function jr_ps_force_login() {
 		$theme_my_login_active = $theme_my_login_active || is_plugin_active_for_network( $theme_my_login_path );
 	}
 	if ( $theme_my_login_active ) {
-		if ( NULL !== ( $page = get_post() ) ) {
+		if ( NULL !== ( $page = get_post( $null = NULL ) ) ) {
+			/*	Some Versions of WordPress required that get_post() have a parameter
+			*/
 			if ( ( 'page' === $page->post_type )
 				&& in_array( $page->post_name, array( 'login', 'logout', 'lostpassword', 'register', 'resetpass' ) )
 				&& stripos( $page->post_content, 'theme-my-login' ) ) {
