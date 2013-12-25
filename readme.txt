@@ -39,6 +39,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 
 == Changelog ==
 
+= 2.7 =
+* Add Custom Login URL setting
+
 = 2.6.1 =
 * Older versions of WordPress require a parameter be passed to get_post()
 
@@ -84,6 +87,9 @@ This section describes how to install the *jonradio Private Site* plugin and get
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.7 =
+Support Custom Login page
 
 = 2.6.1 =
 Support Theme My Login plugin with older versions of WordPress

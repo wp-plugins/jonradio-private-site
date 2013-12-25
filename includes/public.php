@@ -43,6 +43,9 @@ function jr_ps_force_login() {
 	if ( $settings['excl_home'] && jr_v1_same_url( get_home_url(), $current_url ) ) {
 		return;
 	}
+	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) && jr_v1_same_url( $settings['login_url'], $current_url ) ) {
+		return;
+	}
 	if ( isset( $settings['excl_url'] ) ) {
 		foreach ( $settings['excl_url'] as $arr ) {
 			/*	Test the pre-parsed URL in the URL Exclusion list
@@ -124,11 +127,27 @@ function jr_ps_force_login() {
 			$after_login_url = trim( $settings['specific_url'] );
 			break;
 	}
-	//	Avoid situations where specific URL is requested, but URL is blank
-	if ( !empty( $after_login_url ) ) {
-		wp_redirect( wp_login_url( $after_login_url ) );
-		exit;
+	
+	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
+		$url = $settings['login_url'];
+	} else {
+		/*	Avoid situations where specific URL is requested, 
+			but URL is blank.
+		*/
+		if ( empty( $after_login_url ) ) {
+			$url = wp_login_url();
+		} else {
+			$url = wp_login_url( $after_login_url );
+		}
 	}
+	/*	Next line:
+		wp_redirect( $url ) goes to $url right after exit on the line that follows;
+		wp_login_url() returns the standard WordPress login URL;
+		$after_login_url is the URL passed to the standard WordPress login URL,
+		via the ?redirect_to= URL query parameter, to go to after login is complete.
+	*/
+	wp_redirect( $url );
+	exit;
 }
 
 ?>
