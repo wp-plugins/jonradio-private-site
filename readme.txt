@@ -37,6 +37,14 @@ This section describes how to install the *jonradio Private Site* plugin and get
 1. Go to the plugin's Settings page to make the Site **Private**, and set where the user ends up after logging in: the **Landing Location**.
 1. If you allow Self-Registration, where new Users can set up their own User Name on your WordPress site or Network, you will want to select **Reveal User Registration Page** on the plugin's Settings page.
 
+== Frequently Asked Questions ==
+
+= How do I fix Redirect Loops (browser cycles for a long time then gives up)? =
+
+By far, the most common way to create a Redirect Loop on your browser with this *jonradio Private Site* plugin is to specify both Custom Login page and Landing Location on the plugin's Settings page.  Simply setting "Where to after Login?" in the Landing Location section to "Omit ?redirect_to= from URL" should correct the problem.
+
+This problem has been observed when the URL of the Custom Login page is a WordPress Page.  It occurs because, for Page URLs, WordPress uses the ?redirect_to= Query keyword for purposes other than a Landing Location.
+
 == Changelog ==
 
 = 2.7 =

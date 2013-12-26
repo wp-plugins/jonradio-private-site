@@ -126,10 +126,17 @@ function jr_ps_force_login() {
 		case 'url':
 			$after_login_url = trim( $settings['specific_url'] );
 			break;
+		case 'omit':
+			$after_login_url = '';
+			break;
 	}
 	
 	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
-		$url = $settings['login_url'];
+		if ( empty( $after_login_url ) ) {
+			$url = $settings['login_url'];
+		} else {
+			$url = add_query_arg( 'redirect_to', $after_login_url, $settings['login_url'] );
+		}
 	} else {
 		/*	Avoid situations where specific URL is requested, 
 			but URL is blank.
@@ -140,6 +147,7 @@ function jr_ps_force_login() {
 			$url = wp_login_url( $after_login_url );
 		}
 	}
+
 	/*	Next line:
 		wp_redirect( $url ) goes to $url right after exit on the line that follows;
 		wp_login_url() returns the standard WordPress login URL;

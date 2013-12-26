@@ -146,7 +146,7 @@ function jr_ps_admin_init() {
 		);
 	}
 	add_settings_field( 'reveal_registration', 
-		'Reveal User Registration Page', 
+		'Reveal Registration Page', 
 		'jr_ps_echo_reveal_registration', 
 		'jr_ps_settings_page', 
 		'jr_ps_self_registration_section' 
@@ -230,6 +230,12 @@ function jr_ps_echo_private_site() {
 	$settings = get_option( 'jr_ps_settings' );
 	echo '<input type="checkbox" id="private_site" name="jr_ps_settings[private_site]" value="true"'
 		. checked( TRUE, $settings['private_site'], FALSE ) . ' />';
+	echo ' (This plugin is currently ';
+	if ( $settings['private_site'] ) {
+		echo 'enabled; click checkbox to disable)';
+	} else {
+		echo 'disabled; click checkbox to enable)';
+	}
 }
 
 /**
@@ -266,19 +272,13 @@ function jr_ps_self_registration_expl() {
 	</p>
 	<p>
 	Second, is a Setting
-	(Reveal User Registration Page)
+	(Reveal Registration Page)
 	for this plugin,
-	to make the WordPress Registration page visible to Visitors who are not logged on.
+	to make the WordPress User Registration page visible to Visitors who are not logged on.
 	Since Users cannot log on until they are Registered,
 	this Setting must be selected (check mark) for Self-Registration.
 	</p>
 	';
-}
-
-function jr_ps_echo_reveal_registration() {
-	$settings = get_option( 'jr_ps_settings' );
-	echo '<input type="checkbox" id="reveal_registration" name="jr_ps_settings[reveal_registration]" value="true"'
-		. checked( TRUE, $settings['reveal_registration'], FALSE ) . ' />';
 }
 
 function jr_ps_echo_registrations() {
@@ -300,6 +300,13 @@ function jr_ps_echo_registrations() {
 function jr_ps_echo_membership() {
 	echo '<input type="checkbox" id="membership" name="jr_ps_settings[membership]" value="1" '
 		. checked( '1', get_option( 'users_can_register' ), FALSE ) . ' /> Anyone can register';
+}
+
+function jr_ps_echo_reveal_registration() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="reveal_registration" name="jr_ps_settings[reveal_registration]" value="true"'
+		. checked( TRUE, $settings['reveal_registration'], FALSE ) . ' />';
+	echo ' Do not block WordPress standard User Registration page (Advanced Setting: a check mark in this checkbox is recommended)';
 }
 
 /**
@@ -331,6 +338,7 @@ function jr_ps_echo_landing() {
 		'return' => 'Return to same URL',
 	    'home'   => 'Go to Site Home',
 	    'admin'  => 'Go to WordPress Admin Dashboard',
+		'omit'   => 'Omit <code>?redirect_to=</code> from URL (a check mark in this checkbox is recommended for Custom Login pages)', 
 	    'url'    => 'Go to Specific URL'
 		) as $val => $desc ) {
 		if ( $first ) {
@@ -367,6 +375,8 @@ function jr_ps_custom_login_expl() {
 	echo '<p>If you have a Custom Login page at a different URL than the standard WordPress Login <code>'
 		. wp_login_url()
 		. '</code>, then you will need to specify it here. Otherwise, visitors will be redirected to the standard WordPress Login.</p>';
+	echo '<p>If the Custom Login page is not based on the standard WordPress Login page, it may not accept the <code>?redirect_to=http://landingurl</code> Query that is automatically added to the URL of the Custom Login page. Select Omit for "Where to after Login?" in the Landing Location section to remove the <code>redirect_to</code> Query.</p>';
+	echo '<p>Even with the Custom Login page selected, the standard WordPress login page will still appear in certain circumstances, such as logging into the Admin panels.<p>';
 }
 
 function jr_ps_echo_custom_login() {
@@ -559,6 +569,18 @@ function jr_ps_validate_settings( $input ) {
 			$valid['custom_login'] = FALSE;
 		} else {
 			$valid['custom_login'] = TRUE;
+			/*	Was Custom Login just turned on?
+				If so, be sure Landing Location is set to Omit.
+			*/
+			if ( !$setting['custom_login'] && ( 'omit' !== $valid['landing'] ) ) {
+				$valid['landing'] = 'omit';
+				add_settings_error(
+					'jr_ps_settings',
+					'jr_ps_setomit',
+					'Landing Location changed to "Omit", recommended for Custom Login pages.',
+					'updated'
+				);
+			}
 		}
 	} else {
 		$valid['custom_login'] = FALSE;
