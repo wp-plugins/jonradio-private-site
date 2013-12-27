@@ -12,19 +12,28 @@ Create a Private Site visible only to your registered users.
 
 == Description ==
 
-Allows the Administrator to restrict a WordPress-based web site to viewing only by registered users who are logged on.
+Allows the Administrator to restrict a WordPress-based web site to viewing only by registered users who are logged on.  Any attempt, by anyone not logged, to view any Page, Post or other part of the site will display a WordPress login screen.
 
-Any attempt to view any Page, Post or other part of the site will see anyone not logged on greeted by a WordPress login screen.  A Settings Page allows the Administrator to determine where Users will be automatically directed to each time that they login, a "Landing Location".
+Login prompts are provided whenever a non-logged in user ("site visitor") attempts to access any URL controlled by WordPress on the web site.  This plugin does not control non-WordPress web pages, such as .html and .php files created by hand or by other software products.  Or images and other media and text files directly accessed by their URL, or from a browser's directory view, if available.
+
+Features and Settings:
+
+* Supports WordPress Networks ("Multisite"), with Network-wide Settings planned for a future version
+* Visible Exclusions settings allow the entry of a list of URLs that will always be visible, and never be hidden by the plugin;  a separate Setting is provided for hiding or revealing Site Home without the need to enter its URL
+* Supports Custom Login and Registration pages at URLs different than the standard WordPress Login and Registration URLs
+* Landing Location settings determine what the User sees after successfully logging in
+* User Self-Registration settings (varies between Network and Non-Network WordPress) are presented on the plugin's Settings page for easy access
+* No known Theme incompatibilities, and only known Plugin incompatibility is with the A5 Custom Login plugin
+* Special functionality is included to not hide Login- and Registration-related URLs used by BuddyPress and Theme My Login plugins
+* Remember Me improvements at Login via free companion plugin, jonradio Remember Me, which can be downloaded separately from the WordPress Plugin Repository
+* Overrides WordPress hiding of Network Activated plugins, just for itself;  tp provide this feature for all plugins, use the free companion plugin, jonradio Reveal Network Activated Plugins, which can be downloaded separately from the WordPress Plugin Repository
+* Setting to disable the plugin so that other plugin Settings can be changed when the Site is not set to Private
 
 If you allow Self-Registration, where new Users can Register themselves, you will need to select the "Reveal User Registration Page" setting or new Users will be blocked from seeing the WordPress Registration screen (on WordPress Networks, turning off the Reveal User Registration Page setting on the "Main Site" will prevent Registration from all Sites).  For convenience, the WordPress Setting that controls Self-Registration of Users has been added to the Plugin's Settings page.
 
 Another Setting allows the Private Site feature to be turned off.  When the plugin is installed and activated, the Private Site feature is set off by default, to allow the Administrator an opportunity to become familiarized with the plugin's features and to set the desired settings.  A warning that the site is not private appears after first activation of the plugin until the Administrator visits the plugin's Settings page.
 
-There is also a Setting to make the Home Page visible on a Private Site.  And another Setting to create URL entries for those site URLs that should always be visible.
-
 If a WordPress Network is defined, the plugin can be activated individually for select sites.  Or Network Activated.  In either case, each site will have its own Settings page where the Private Site feature can be turned off (default) or on for just the one site, and a Landing Location defined for each site.
-
-Login prompts are provided whenever a non-logged in user ("site visitor") attempts to access any URL controlled by WordPress on the web site.  This plugin does not control non-WordPress web pages, such as .html and .php files created by hand or by other software products.  Or images and other media and text files directly accessed by their URL, or from a browser's directory view, if available.
 
 Yes, there are other plugins that hide some or all WordPress content for any site visitor who is not logged on.  But when I was searching for a solution for one of the web sites I support, I decided to "write my own" because I knew how it worked and felt comfortable that there would be no way for anyone not logged in to view the site, including Search Engines.
 
@@ -44,6 +53,10 @@ This section describes how to install the *jonradio Private Site* plugin and get
 By far, the most common way to create a Redirect Loop on your browser with this *jonradio Private Site* plugin is to specify both Custom Login page and Landing Location on the plugin's Settings page.  Simply setting "Where to after Login?" in the Landing Location section to "Omit ?redirect_to= from URL" should correct the problem.
 
 This problem has been observed when the URL of the Custom Login page is a WordPress Page.  It occurs because, for Page URLs, WordPress uses the ?redirect_to= Query keyword for purposes other than a Landing Location.
+
+= What happened?  I changed my Permalinks and now some things don't work. =
+
+Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin panels), this *jonradio Private Site* plugin does **not** automatically change any URLs you have entered in the plugin's Settings.  You will therefore want to make changes to URLs in the plugin's Settings whenever you change Permalinks.
 
 == Changelog ==
 
