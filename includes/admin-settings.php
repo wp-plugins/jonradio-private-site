@@ -7,6 +7,8 @@
 //	Exit if .php file accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
+DEFINE( 'JR_PS_BELOW_FIELDS', '<br /> &nbsp; ' );
+
 require_once( jr_ps_path() . 'includes/functions-admin.php' );
 
 add_action( 'admin_menu', 'jr_ps_admin_hook' );
@@ -35,7 +37,6 @@ function jr_ps_settings_page() {
 	global $jr_ps_plugin_data;
 	add_thickbox();
 	echo '<div class="wrap">';
-	screen_icon( 'plugins' );
 	echo '<h2>' . $jr_ps_plugin_data['Name'] . '</h2>';
 	
 	//	Required because it is only called automatically for Admin Pages in the Settings section
@@ -167,13 +168,30 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_landing_settings_section' 
 	);
+	add_settings_section( 'jr_ps_custom_login_section', 
+		'Custom Login', 
+		'jr_ps_custom_login_expl', 
+		'jr_ps_settings_page' 
+	);
+	add_settings_field( 'custom_login', 
+		'Custom Login page?', 
+		'jr_ps_echo_custom_login', 
+		'jr_ps_settings_page', 
+		'jr_ps_custom_login_section' 
+	);
+	add_settings_field( 'login_url', 
+		'Custom Login URL', 
+		'jr_ps_echo_login_url', 
+		'jr_ps_settings_page', 
+		'jr_ps_custom_login_section' 
+	);
 	add_settings_section( 'jr_ps_exclusions_section', 
 		'Visible Exclusions', 
 		'jr_ps_exclusions_expl', 
 		'jr_ps_settings_page' 
 	);
 	add_settings_field( 'excl_home', 
-		'Site Home Always Visible?', 
+		'Site Home Always Visible?<br /><code>' . get_home_url() . '</code>', 
 		'jr_ps_echo_excl_home', 
 		'jr_ps_settings_page', 
 		'jr_ps_exclusions_section' 
@@ -184,15 +202,12 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_exclusions_section' 
 	);
-	$settings = get_option( 'jr_ps_settings' );
-	if ( !empty( $settings['excl_url'] ) ) {
-		add_settings_field( 'excl_url_del', 
-			'Current Visible URL Entries', 
-			'jr_ps_echo_excl_url_del', 
-			'jr_ps_settings_page', 
-			'jr_ps_exclusions_section' 
-		);		
-	}
+	add_settings_field( 'excl_url_del', 
+		'Current Visible URL Entries', 
+		'jr_ps_echo_excl_url_del', 
+		'jr_ps_settings_page', 
+		'jr_ps_exclusions_section' 
+	);
 }
 
 /**
@@ -283,7 +298,7 @@ function jr_ps_echo_registrations() {
 }
 
 function jr_ps_echo_membership() {
-	echo '<input type="checkbox" id="membership" name="jr_ps_settings[membership]" value="1"'
+	echo '<input type="checkbox" id="membership" name="jr_ps_settings[membership]" value="1" '
 		. checked( '1', get_option( 'users_can_register' ), FALSE ) . ' /> Anyone can register';
 }
 
@@ -333,16 +348,53 @@ function jr_ps_echo_specific_url() {
 	$settings = get_option( 'jr_ps_settings' );
 	echo '<input type="text" id="specific_url" name="jr_ps_settings[specific_url]" size="100" maxlength="256" value="';
 	echo esc_url( $settings['specific_url'] ) 
-		. '" />
-			<br />
-			(cut and paste URL here of Page, Post or other)
-			<br />
-			URL must begin with
-			<code>' 
+		. '" />'
+		. JR_PS_BELOW_FIELDS
+		. '(cut and paste URL here of Page, Post or other)'
+		. JR_PS_BELOW_FIELDS
+		. 'URL must begin with <code>' 
 		. trim( get_home_url(), '\ /' ) 
 		. '/</code>';
 }
 
+/**
+ * Section text for Section4
+ * 
+ * Display an explanation of this Section
+ *
+ */
+function jr_ps_custom_login_expl() {
+	echo '<p>If you have a Custom Login page at a different URL than the standard WordPress Login <code>'
+		. wp_login_url()
+		. '</code>, then you will need to specify it here. Otherwise, visitors will be redirected to the standard WordPress Login.</p>';
+}
+
+function jr_ps_echo_custom_login() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="custom_login" name="jr_ps_settings[custom_login]" value="true" '
+		. checked( TRUE, $settings['custom_login'], FALSE )
+		. ' />';
+}
+
+function jr_ps_echo_login_url() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="text" id="login_url" name="jr_ps_settings[login_url]" size="100" maxlength="256" value="'
+		. esc_url( $settings['login_url'] ) 
+		. '" />'
+		. JR_PS_BELOW_FIELDS
+		. '(cut and paste Custom Login URL here; leave blank otherwise)'
+		. JR_PS_BELOW_FIELDS
+		. 'URL must begin with <code>' 
+		. trim( get_home_url(), '\ /' ) 
+		. '/</code>';
+}
+
+/**
+ * Section text for Section5
+ * 
+ * Display an explanation of this Section
+ *
+ */
 function jr_ps_exclusions_expl() {
 	?>
 	<p>
@@ -363,27 +415,36 @@ function jr_ps_echo_excl_home() {
 	$settings = get_option( 'jr_ps_settings' );
 	echo '<input type="checkbox" id="excl_home" name="jr_ps_settings[excl_home]" value="true"'
 		. checked( TRUE, $settings['excl_home'], FALSE ) . ' /> Site Home is visible to everyone?';
-	echo '<br />(' . get_home_url() . ')';
 }
 
 function jr_ps_echo_excl_url_add() {
-	?>
-	<input id="excl_url_add" name="jr_ps_settings[excl_url_add]" type="text" size="100" maxlength="256" value="" />
-	<br />
-	(cut and paste URL here of Page, Post or other)
-	<br />
-	URL must begin with
-	<?php
-	echo '<code>' . trim( get_home_url(), '\ /' ) . '/</code>';
+	echo '<input id="excl_url_add" name="jr_ps_settings[excl_url_add]" type="text" size="100" maxlength="256" value="" />'
+		. JR_PS_BELOW_FIELDS
+		. '(cut and paste URL here of Page, Post or other)'
+		. JR_PS_BELOW_FIELDS
+		. 'URL must begin with <code>' 
+		. trim( get_home_url(), '\ /' ) 
+		. '/</code>';
 }
 
 function jr_ps_echo_excl_url_del() {
 	$settings = get_option( 'jr_ps_settings' );
-	foreach ( $settings['excl_url'] as $index => $arr ) {
-		$display_url = $arr[0];
-		echo "Delete <input type='checkbox' id='excl_url_del' name='jr_ps_settings[excl_url_del][]' value='$index' />"
-			. " <a href='$display_url' target='_blank'>$display_url</a><br />";
+	if ( empty( $settings['excl_url'] ) ) {
+		echo 'None. To add a Visible URL Entry, fill in the fields above.';
+	} else {
+		$first = TRUE;
+		foreach ( $settings['excl_url'] as $index => $arr ) {
+			if ( $first ) {
+				$first = FALSE;
+			} else {
+				echo '<br />';
+			}
+			$display_url = $arr[0];
+			echo "Delete <input type='checkbox' id='excl_url_del' name='jr_ps_settings[excl_url_del][]' value='$index' />"
+				. " <a href='$display_url' target='_blank'>$display_url</a>";
+		}
 	}
+	echo '<br />The Custom Login URL, if specified, is always Visible.';
 }
 
 function jr_ps_validate_settings( $input ) {
@@ -457,6 +518,51 @@ function jr_ps_validate_settings( $input ) {
 		$valid['landing'] = $input['landing'];
 	}
 	
+	$url = jr_v1_sanitize_url( $input['login_url'] );	
+	if ( '' !== $url ) {
+		if ( FALSE === $url ) {
+			/*	Reset to previous URL value and generate an error message.
+			*/
+			$url = $settings['login_url'];			
+			add_settings_error(
+				'jr_ps_settings',
+				'jr_ps_urlerror',
+				'Custom Login URL is not a valid URL<br /><code>'
+					. sanitize_text_field( $input['login_url'] ) . '</code>',
+				'error'
+			);
+		} else {
+			if ( !jr_ps_site_url( $url ) ) {
+				/*	Reset to previous URL value and generate an error message.
+				*/
+				$url = $settings['login_url'];
+				add_settings_error(
+					'jr_ps_settings',
+					'jr_ps_urlerror',
+					'Error in Custom Login URL.  It must point to someplace on this WordPress web site<br /><code>'
+						. sanitize_text_field( $input['login_url'] ) . '</code>',
+					'error'
+				);
+			}
+		}
+	}
+	$valid['login_url'] = $url;
+	
+	if ( isset( $input['custom_login'] ) && ( $input['custom_login'] === 'true' ) ) {
+		if ( '' === $valid['login_url'] ) {
+			add_settings_error(
+				'jr_ps_settings',
+				'jr_ps_nourlerror',
+				'Error in Custom Login: <i>Custom Login page?</i> checkbox selected but no URL specified.  Checkbox deselected.',
+				'error'
+			);
+			$valid['custom_login'] = FALSE;
+		} else {
+			$valid['custom_login'] = TRUE;
+		}
+	} else {
+		$valid['custom_login'] = FALSE;
+	}
 	
 	if ( isset( $input['excl_home'] ) && ( $input['excl_home'] === 'true' ) ) {
 		$valid['excl_home'] = TRUE;

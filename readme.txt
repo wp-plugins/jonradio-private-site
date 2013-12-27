@@ -3,8 +3,8 @@ Contributors: jonradio
 Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
-Tested up to: 3.7.1
-Stable tag: 2.5
+Tested up to: 3.8
+Stable tag: 2.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,15 @@ This section describes how to install the *jonradio Private Site* plugin and get
 1. If you allow Self-Registration, where new Users can set up their own User Name on your WordPress site or Network, you will want to select **Reveal User Registration Page** on the plugin's Settings page.
 
 == Changelog ==
+
+= 2.7 =
+* Add Custom Login URL setting
+
+= 2.6.1 =
+* Older versions of WordPress require a parameter be passed to get_post()
+
+= 2.6 =
+* Detect and make visible Login-associated Pages created by the Theme My Login plugin
 
 = 2.5 =
 * Allow other URLs to be Always Visible with new Setting
@@ -78,6 +87,15 @@ This section describes how to install the *jonradio Private Site* plugin and get
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.7 =
+Support Custom Login page
+
+= 2.6.1 =
+Support Theme My Login plugin with older versions of WordPress
+
+= 2.6 =
+Support Theme My Login plugin
 
 = 2.5 =
 Allow many Always Visible pages
