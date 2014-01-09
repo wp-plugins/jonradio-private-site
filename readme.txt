@@ -20,6 +20,7 @@ Features and Settings:
 
 * Supports WordPress Networks ("Multisite"), with Network-wide Settings planned for a future version
 * Visible Exclusions settings allow the entry of a list of URLs that will always be visible, and never be hidden by the plugin;  a separate Setting is provided for hiding or revealing Site Home without the need to enter its URL
+* A URL Prefix option in Visible Exclusions, matches, and makes visible, all URLs that begin with the one or more partial URLs entered
 * Supports Custom Login and Registration pages at URLs different than the standard WordPress Login and Registration URLs
 * Landing Location settings determine what the User sees after successfully logging in
 * User Self-Registration settings (varies between Network and Non-Network WordPress) are presented on the plugin's Settings page for easy access
@@ -59,6 +60,10 @@ This problem has been observed when the URL of the Custom Login page is a WordPr
 Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin panels), this *jonradio Private Site* plugin does **not** automatically change any URLs you have entered in the plugin's Settings.  You will therefore want to make changes to URLs in the plugin's Settings whenever you change Permalinks.
 
 == Changelog ==
+
+= 2.8 =
+* Add Prefix option to Always Visible URLs
+* Automatically use mb_ Multi-Byte string functions, if available
 
 = 2.7 =
 * Add Custom Login URL setting
@@ -108,6 +113,9 @@ Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin pane
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.8 =
+Support Prefix URL for Always Visible pages
 
 = 2.7 =
 Support Custom Login page

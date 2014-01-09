@@ -55,6 +55,15 @@ function jr_ps_force_login() {
 			}
 		}
 	}
+	if ( isset( $settings['excl_url_prefix'] ) ) {
+		foreach ( $settings['excl_url_prefix'] as $arr ) {
+			/*	Test the pre-parsed URL in the Prefix URL Exclusion list
+			*/
+			if ( jr_v1_same_prefix_url( $arr[1], $current_url ) ) {
+				return;
+			}
+		}
+	}
 	
 	if ( $settings['reveal_registration'] ) {
 		$buddypress_path = 'buddypress/bp-loader.php';

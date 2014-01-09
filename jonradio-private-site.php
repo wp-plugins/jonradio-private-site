@@ -3,13 +3,13 @@
 Plugin Name: jonradio Private Site
 Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
 Description: Creates a Private Site by allowing only those logged on to view the WordPress web site.  Settings select the initial destination after login.
-Version: 2.7
+Version: 2.8
 Author: jonradio
 Author URI: http://jonradio.com/plugins
 License: GPLv2
 */
 
-/*  Copyright 2013  jonradio  (email : info@jonradio.com)
+/*  Copyright 2014  jonradio  (email : info@jonradio.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,26 +88,6 @@ if ( ( FALSE === ( $internal_settings = get_option( 'jr_ps_internal_settings' ) 
 	$old_version = $internal_settings['version'];
 }
 
-$settings = get_option( 'jr_ps_settings' );
-if ( empty( $settings ) ) {
-	$settings = array(
-		'private_site'        => FALSE,
-		'reveal_registration' => TRUE,
-		'landing'             => 'return',
-		'specific_url'        => '',
-		'custom_login'        => FALSE,
-		'login_url'           => '',
-		'excl_url'            => array(),
-		'excl_home'           => FALSE
-	);
-	/*	Add if Settings don't exist, re-initialize if they were empty.
-	*/
-	update_option( 'jr_ps_settings', $settings );
-	/*	New install on this site, old version or corrupt settings
-	*/
-	$old_version = $jr_ps_plugin_data['Version'];
-}
-
 if ( version_compare( $old_version, $jr_ps_plugin_data['Version'], '!=' ) ) {
 	/*	Create, if internal settings do not exist; update if they do exist
 	*/
@@ -120,26 +100,23 @@ if ( version_compare( $old_version, $jr_ps_plugin_data['Version'], '!=' ) ) {
 		$internal_settings['warning_privacy'] = TRUE;
 	}
 	update_option( 'jr_ps_internal_settings', $internal_settings );
-
-	/*	Handle all Settings changes made in old plugin versions
-	*/
-	if ( version_compare( $old_version, '2.1', '<' ) ) {
-		$settings['reveal_registration'] = FALSE;
-	}
-	if ( version_compare( $old_version, '2.3', '<' ) ) {
-		$settings['excl_home'] = FALSE;
-	}
-	if ( version_compare( $old_version, '2.5', '<' ) ) {
-		$settings['excl_url'] = array();
-	}
-	if ( version_compare( $old_version, '2.7', '<' ) ) {
-		$settings['custom_login'] = FALSE;
-		$settings['login_url'] = '';
-	}
-	update_option( 'jr_ps_settings', $settings );
 }
 
 require_once( jr_ps_path() . 'includes/common-functions.php' );
+jr_v1_validate_settings( 'jr_ps_settings',
+	array(
+		'private_site'        => FALSE,
+		'reveal_registration' => TRUE,
+		'landing'             => 'return',
+		'specific_url'        => '',
+		'custom_login'        => FALSE,
+		'login_url'           => '',
+		'excl_url'            => array(),
+		'excl_url_prefix'     => array(),
+		'excl_home'           => FALSE
+	)
+);
+$settings = get_option( 'jr_ps_settings' );
 if ( is_admin() ) {
 	require_once( jr_ps_path() . 'includes/all-admin.php' );
 	/* 	Support WordPress Version 3.0.x before is_network_admin() existed

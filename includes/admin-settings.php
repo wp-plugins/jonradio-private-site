@@ -202,6 +202,12 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_exclusions_section' 
 	);
+	add_settings_field( 'excl_url_is_prefix', 
+		'Select here if URL is a Prefix', 
+		'jr_ps_echo_excl_url_is_prefix', 
+		'jr_ps_settings_page', 
+		'jr_ps_exclusions_section' 
+	);
 	add_settings_field( 'excl_url_del', 
 		'Current Visible URL Entries', 
 		'jr_ps_echo_excl_url_del', 
@@ -410,6 +416,7 @@ function jr_ps_exclusions_expl() {
 	<p>
 	If you want to use your Site Home to interest visitors in registering for your site so they can see the rest of your site,
 	you obviously need Site Home visible to everyone.
+	</p><p>
 	You can add additional Visible site URLs,
 	one entry at a time,
 	in the 
@@ -417,6 +424,13 @@ function jr_ps_exclusions_expl() {
 	Add URL to be Always Visible 
 	</b>
 	field.
+	</p><p>
+	The
+	<b>
+	Select here if URL is a Prefix
+	</b>
+	option allows you to specify a portion of a URL,
+	which will match, and make visible, all URLs that begin with that specified portion ("URL Prefix").
 	</p>
 	<?php
 }
@@ -437,24 +451,32 @@ function jr_ps_echo_excl_url_add() {
 		. '/</code>';
 }
 
+function jr_ps_echo_excl_url_is_prefix() {
+	?>
+	<input type="checkbox" id="excl_url_is_prefix" name="jr_ps_settings[excl_url_is_prefix]" value="true" /> Anything that begins with this URL Prefix will be Always Visible
+	<?php
+}
+
 function jr_ps_echo_excl_url_del() {
 	$settings = get_option( 'jr_ps_settings' );
-	if ( empty( $settings['excl_url'] ) ) {
-		echo 'None. To add a Visible URL Entry, fill in the fields above.';
+	if ( empty( $settings['excl_url'] ) && empty( $settings['excl_url_prefix'] ) ) {
+		echo 'None. To add a Visible URL Entry, fill in the fields above.<br />The Custom Login URL, if specified, is always Visible.';
 	} else {
 		$first = TRUE;
-		foreach ( $settings['excl_url'] as $index => $arr ) {
-			if ( $first ) {
-				$first = FALSE;
-			} else {
-				echo '<br />';
+		foreach ( array( 'url' => 'URL', 'url_prefix' => 'Prefix' ) as $key => $description ) {
+			foreach ( $settings["excl_$key"] as $index => $arr ) {
+				if ( $first ) {
+					$first = FALSE;
+				} else {
+					echo '<br />';
+				}
+				$display_url = $arr[0];
+				echo 'Delete <input type="checkbox" id="excl_' . $key . '_del" name="jr_ps_settings[excl_' . $key . '_del][]"'
+					. " value='$index' /> $description=<a href='$display_url' target='_blank'>$display_url</a>";
 			}
-			$display_url = $arr[0];
-			echo "Delete <input type='checkbox' id='excl_url_del' name='jr_ps_settings[excl_url_del][]' value='$index' />"
-				. " <a href='$display_url' target='_blank'>$display_url</a>";
 		}
+		echo '<br />In addition, the Custom Login URL, if specified, is always Visible.';
 	}
-	echo '<br />The Custom Login URL, if specified, is always Visible.';
 }
 
 function jr_ps_validate_settings( $input ) {
@@ -607,16 +629,19 @@ function jr_ps_validate_settings( $input ) {
 		update_option( 'users_can_register', $mem );
 	}
 	
-	if ( isset( $settings['excl_url'] ) ) {
-		$valid['excl_url'] = $settings['excl_url'];
-	} else {
-		$valid['excl_url'] = array();
-	}
-	/*	Delete URLs to Exclude from Privacy.
-	*/
-	if ( isset ( $input['excl_url_del'] ) ) {
-		foreach ( $input['excl_url_del'] as $excl_url_del ) {
-			unset( $valid['excl_url'][$excl_url_del] );
+	foreach ( array( 'excl_url', 'excl_url_prefix' ) as $key ) {
+		if ( isset( $settings[$key] ) ) {
+			$valid[$key] = $settings[$key];
+		} else {
+			$valid[$key] = array();
+		}
+	
+		/*	Delete URLs to Exclude from Privacy.
+		*/
+		if ( isset ( $input[$key . '_del'] ) ) {
+			foreach ( $input[$key . '_del'] as $excl_url_del ) {
+				unset( $valid[$key][$excl_url_del] );
+			}
 		}
 	}
 
@@ -634,7 +659,12 @@ function jr_ps_validate_settings( $input ) {
 			);
 		} else {
 			if ( jr_ps_site_url( $url ) ) {
-				$valid['excl_url'][] = array( $url, jr_v1_prep_url( $url ) );
+				if ( isset ( $input['excl_url_is_prefix'] ) && ( 'true' === $input['excl_url_is_prefix'] ) ) {
+					$key = 'excl_url_prefix';
+				} else {
+					$key = 'excl_url';
+				}
+				$valid[$key][] = array( $url, jr_v1_prep_url( $url ) );
 			} else {
 				add_settings_error(
 					'jr_ps_settings',
