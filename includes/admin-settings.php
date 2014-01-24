@@ -334,6 +334,9 @@ function jr_ps_landing_settings_expl() {
 	<p>
 	<b>Specific URL</b> only applies when <b>Go to specific URL</b> is selected.
 	</p>
+	</p>
+	Landing Location also is applied to Logins via the Meta Widget.
+	<p>
 	<?php
 }
 

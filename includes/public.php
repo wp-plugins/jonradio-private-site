@@ -9,6 +9,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 
 add_action( 'login_init', 'jr_ps_login' );
 add_action( 'wp', 'jr_ps_force_login' );
+add_filter( 'login_url', 'jr_ps_login_url' );
 
 /**
  * Login Detection
@@ -116,6 +117,51 @@ function jr_ps_force_login() {
 		}
 	}
 	
+	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
+		$url = jr_ps_login_url( $settings['login_url'] );
+	} else {
+		/*	wp_login_url() returns the standard WordPress login URL,
+			but the login_url Filter adds the ?redirect_to= query in the URL.
+		*/
+		$url = wp_login_url();
+	}
+
+	/*	wp_redirect( $url ) goes to $url right after exit on the line that follows.
+	*/
+	wp_redirect( $url );
+	exit;
+}
+
+/**
+ * Add Landing Location to Login URL
+ * 
+ * Although written to modify the Login URL in the Meta Widget,
+ * to implement Landing Location, wp_login_url() is also called
+ * near the end of jr_ps_force_login() above.
+ *
+ * @param	string	$login_url	Login URL
+ * @param	string	$redirect	Path to redirect to on login.	
+ * @return	string				Login URL
+ */
+function jr_ps_login_url( $login_url ) {
+	/*	remove_query_arg() simply returns $login_url if a ?redirect_to= query is not present in the URL.
+	*/
+	$url = remove_query_arg( 'redirect_to', $login_url );
+	/*	$redirect_to is the URL passed to the standard WordPress login URL,
+		via the ?redirect_to= URL query parameter, to go to after login is complete.
+	*/
+	$redirect_to = jr_ps_after_login_url();
+	/*	Also avoids situations where specific URL is requested, 
+		but URL is blank.
+	*/	
+	if ( !empty( $redirect_to ) ) {
+		$url = add_query_arg( 'redirect_to', urlencode( $redirect_to ), $url );
+	}
+	return $url;
+}
+
+function jr_ps_after_login_url() {
+	$settings = get_option( 'jr_ps_settings' );
 	switch ( $settings['landing'] ) {
 		case 'return':
 			//	$_SERVER['HTTPS'] can be off in IIS
@@ -139,32 +185,7 @@ function jr_ps_force_login() {
 			$after_login_url = '';
 			break;
 	}
-	
-	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
-		if ( empty( $after_login_url ) ) {
-			$url = $settings['login_url'];
-		} else {
-			$url = add_query_arg( 'redirect_to', $after_login_url, $settings['login_url'] );
-		}
-	} else {
-		/*	Avoid situations where specific URL is requested, 
-			but URL is blank.
-		*/
-		if ( empty( $after_login_url ) ) {
-			$url = wp_login_url();
-		} else {
-			$url = wp_login_url( $after_login_url );
-		}
-	}
-
-	/*	Next line:
-		wp_redirect( $url ) goes to $url right after exit on the line that follows;
-		wp_login_url() returns the standard WordPress login URL;
-		$after_login_url is the URL passed to the standard WordPress login URL,
-		via the ?redirect_to= URL query parameter, to go to after login is complete.
-	*/
-	wp_redirect( $url );
-	exit;
+	return $after_login_url;
 }
 
 ?>

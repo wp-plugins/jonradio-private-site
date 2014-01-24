@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.8
-Stable tag: 2.8
+Stable tag: 2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,7 @@ Features and Settings:
 * A URL Prefix option in Visible Exclusions, matches, and makes visible, all URLs that begin with the one or more partial URLs entered
 * Supports Custom Login and Registration pages at URLs different than the standard WordPress Login and Registration URLs
 * Landing Location settings determine what the User sees after successfully logging in
+* Landing Location is set for both automatic Login prompts and the Meta Widget's Login link
 * User Self-Registration settings (varies between Network and Non-Network WordPress) are presented on the plugin's Settings page for easy access
 * No known Theme incompatibilities, and only known Plugin incompatibility is with the A5 Custom Login plugin
 * Special functionality is included to not hide Login- and Registration-related URLs used by BuddyPress and Theme My Login plugins
@@ -60,6 +61,9 @@ This problem has been observed when the URL of the Custom Login page is a WordPr
 Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin panels), this *jonradio Private Site* plugin does **not** automatically change any URLs you have entered in the plugin's Settings.  You will therefore want to make changes to URLs in the plugin's Settings whenever you change Permalinks.
 
 == Changelog ==
+
+= 2.9 =
+* Set Landing Location for logins via Meta Widget link, as well as automatic Login prompts
 
 = 2.8 =
 * Add Prefix option to Always Visible URLs
@@ -113,6 +117,9 @@ Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin pane
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.9 =
+Meta Widget logins now go to Landing Location
 
 = 2.8 =
 Support Prefix URL for Always Visible pages
