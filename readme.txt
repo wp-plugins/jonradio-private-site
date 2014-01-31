@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.8
-Stable tag: 2.9
+Stable tag: 2.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,7 +60,17 @@ This problem has been observed when the URL of the Custom Login page is a WordPr
 
 Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin panels), this *jonradio Private Site* plugin does **not** automatically change any URLs you have entered in the plugin's Settings.  You will therefore want to make changes to URLs in the plugin's Settings whenever you change Permalinks.
 
+= Why is User Submenu? setting greyed out? =
+
+This setting controls whether the plugin's settings are accessible from the Users submenu of the WordPress Admin panels.  For security reasons, it can only be used when the plugin's settings are accessed from the Settings submenu.
+
+A Capability of manage_options is required to access the plugin's settings from the Settings submenu.  A Capability of manage_users is required to access the plugin's settings from the Users submenu.
+
 == Changelog ==
+
+= 2.10 =
+* Add setting to no display a Users submenu option for the plugin's settings
+* Conditional logic for Settings Saved update message in Validate function
 
 = 2.9 =
 * Set Landing Location for logins via Meta Widget link, as well as automatic Login prompts
@@ -117,6 +127,9 @@ Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin pane
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.10 =
+Allow deletion of Users submenu entry for plugin settings
 
 = 2.9 =
 Meta Widget logins now go to Landing Location

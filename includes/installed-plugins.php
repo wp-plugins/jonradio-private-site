@@ -63,7 +63,7 @@ if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
 				of the Settings admin page.
 			*/
 			return array( 'Network Activated',
-				'<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=jr_ps_settings' . '">Settings</a>'
+				'<a href="' . get_bloginfo('wpurl') . '/wp-admin/options-general.php?page=jr_ps_settings' . '">Settings</a>'
 				);
 		}
 	} else {
@@ -82,7 +82,7 @@ if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
 				The "page=" query string value must be equal to the slug
 				of the Settings admin page.
 			*/
-			array_push( $links, '<a href="' . get_bloginfo('wpurl') . '/wp-admin/admin.php?page=jr_ps_settings' . '">Settings</a>' );
+			array_push( $links, '<a href="' . get_bloginfo('wpurl') . '/wp-admin/options-general.php?page=jr_ps_settings' . '">Settings</a>' );
 			return $links;
 		}
 	}

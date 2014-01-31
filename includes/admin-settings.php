@@ -23,8 +23,17 @@ add_action( 'admin_menu', 'jr_ps_admin_hook' );
 function jr_ps_admin_hook() {
 	//  Add Settings Page for this Plugin
 	global $jr_ps_plugin_data;
-	add_users_page( $jr_ps_plugin_data['Name'], 'Private Site', 'add_users', 'jr_ps_settings', 'jr_ps_settings_page' );
+	$settings = get_option( 'jr_ps_settings' );
+	if ( $settings['user_submenu'] ) {
+		add_users_page( $jr_ps_plugin_data['Name'], 'Private Site', 'add_users', 'jr_ps_settings', 'jr_ps_users_settings_page' );
+	}
 	add_options_page( $jr_ps_plugin_data['Name'], 'Private Site', 'manage_options', 'jr_ps_settings', 'jr_ps_settings_page' );
+}
+
+function jr_ps_users_settings_page() {
+	global $jr_ps_users_submenu;
+	$jr_ps_users_submenu = TRUE;
+	jr_ps_settings_page();
 }
 
 /**
@@ -121,7 +130,8 @@ function jr_ps_admin_init() {
 		'jr_ps_private_settings_section' 
 	);
 	add_settings_section( 'jr_ps_self_registration_section', 
-		'Allow Self-Registration', 
+		'<input name="save" type="submit" value="Save Changes" class="button-primary" /><hr />'
+		. 'Allow Self-Registration', 
 		'jr_ps_self_registration_expl', 
 		'jr_ps_settings_page' 
 	);
@@ -213,6 +223,17 @@ function jr_ps_admin_init() {
 		'jr_ps_echo_excl_url_del', 
 		'jr_ps_settings_page', 
 		'jr_ps_exclusions_section' 
+	);
+	add_settings_section( 'jr_ps_advanced_settings_section', 
+		'Advanced Settings', 
+		'jr_ps_advanced_settings_expl', 
+		'jr_ps_settings_page' 
+	);
+	add_settings_field( 'user_submenu', 
+		'User Submenu?', 
+		'jr_ps_echo_user_submenu', 
+		'jr_ps_settings_page', 
+		'jr_ps_advanced_settings_section' 
 	);
 }
 
@@ -482,6 +503,47 @@ function jr_ps_echo_excl_url_del() {
 	}
 }
 
+function jr_ps_advanced_settings_expl() {
+}
+
+function jr_ps_echo_user_submenu() {
+	global $jr_ps_users_submenu;
+	if ( isset( $jr_ps_users_submenu ) ) {
+		jr_ps_input_user_submenu( 'hidden' );
+		jr_ps_input_user_submenu( 'disabled' );
+		echo ' (this setting can not be altered from the User submenu)';
+	} else {
+		jr_ps_input_user_submenu( 'normal' );
+		echo ' Should this Settings page be listed in the Users submenu of the Admin panels? (It is always listed in the Settings submenu)';
+	}
+}
+
+/**
+ * Creates <input> for user_submenu
+ * 
+ * Build an <input type=checkbox> form field, or not, of the specified type,
+ * based on the current value of the user_submenu setting.
+ *
+ * @param	string	$type		hidden, disabled, normal
+ * @return  Null				Nothing is returned
+ */
+function jr_ps_input_user_submenu( $type ) {
+	$settings = get_option( 'jr_ps_settings' );
+	$common = ' id="user_submenu" name="jr_ps_settings[user_submenu]" value="true" ';
+	if ( 'hidden' === $type ) {
+		if ( $settings['user_submenu'] ) {
+			echo '<input type="hidden"' . $common . '/>';
+		}
+	} else {
+		echo '<input type="checkbox"' . $common;
+		if ( 'disabled' === $type ) {
+			echo 'disabled="disabled" ';
+		}
+		echo checked( TRUE, $settings['user_submenu'], FALSE )
+			. ' />';
+	}
+}
+
 function jr_ps_validate_settings( $input ) {
 	$valid = array();
 	$settings = get_option( 'jr_ps_settings' );
@@ -679,9 +741,20 @@ function jr_ps_validate_settings( $input ) {
 			}
 		}
 	}
+
+	if ( isset( $input['user_submenu'] ) && ( $input['user_submenu'] === 'true' ) ) {
+		$valid['user_submenu'] = TRUE;
+	} else {
+		$valid['user_submenu'] = FALSE;
+	}
 	
+	global $jr_ps_users_submenu;
+	/*	This conditional is really a poor solution, but it is the only thing I could find that worked.
+		Anything else gave me zero or two Settings Saved messages, with the main problem being on the 
+		Settings submenu page when checkbox was filled for 'user_submenu' and Save Settings button hit.
+	*/
 	$errors = get_settings_errors();
-	if ( empty( $errors ) ) {
+	if ( $valid['user_submenu'] = TRUE || ( ( isset( $jr_ps_users_submenu ) ) && ( empty( $errors ) ) ) ) {
 		add_settings_error(
 			'jr_ps_settings',
 			'jr_ps_saved',
