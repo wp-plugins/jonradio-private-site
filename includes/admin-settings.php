@@ -178,6 +178,12 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_landing_settings_section' 
 	);
+	add_settings_field( 'wplogin_php', 
+		'Apply to wp-login.php?', 
+		'jr_ps_echo_wplogin_php', 
+		'jr_ps_settings_page', 
+		'jr_ps_landing_settings_section' 
+	);
 	add_settings_section( 'jr_ps_custom_login_section', 
 		'Custom Login', 
 		'jr_ps_custom_login_expl', 
@@ -395,6 +401,13 @@ function jr_ps_echo_specific_url() {
 		. '/</code>';
 }
 
+function jr_ps_echo_wplogin_php() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="wplogin_php" name="jr_ps_settings[wplogin_php]" value="true"'
+		. checked( TRUE, $settings['wplogin_php'], FALSE ) 
+		. ' /> Should Landing Location apply when a <code>wp-login.php</code> URL is clicked or typed without <code>&redirect_to=</code> after it?';
+}
+
 /**
  * Section text for Section4
  * 
@@ -559,7 +572,13 @@ function jr_ps_validate_settings( $input ) {
 	} else {
 		$valid['reveal_registration'] = FALSE;
 	}
-	
+
+	if ( isset( $input['wplogin_php'] ) && ( $input['wplogin_php'] === 'true' ) ) {
+		$valid['wplogin_php'] = TRUE;
+	} else {
+		$valid['wplogin_php'] = FALSE;
+	}
+
 	$url = jr_v1_sanitize_url( $input['specific_url'] );
 	if ( '' !== $url ) {
 		if ( FALSE === $url ) {

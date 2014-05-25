@@ -11,6 +11,18 @@ add_action( 'login_init', 'jr_ps_login' );
 add_action( 'wp', 'jr_ps_force_login' );
 add_filter( 'login_url', 'jr_ps_login_url' );
 
+$settings = get_option( 'jr_ps_settings' );
+if ( $settings['wplogin_php'] ) {
+	add_filter( 'login_redirect', 'jr_ps_login_redirect_filter', 10, 3 );
+}
+
+function jr_ps_login_redirect_filter( $redirect_to, $requested_redirect_to, $user ) {
+	if ( '' === $requested_redirect_to ) {
+		$redirect_to = jr_ps_after_login_url();
+	}
+	return $redirect_to;
+}
+
 /**
  * Login Detection
  * 

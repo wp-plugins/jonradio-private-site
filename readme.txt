@@ -3,8 +3,8 @@ Contributors: jonradio
 Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
-Tested up to: 3.8
-Stable tag: 2.10
+Tested up to: 3.9
+Stable tag: 2.10.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,8 +68,11 @@ A Capability of manage_options is required to access the plugin's settings from 
 
 == Changelog ==
 
+= 2.10.1 =
+* Add setting to obey Landing Location for users who login via a URL of wp-login.php without a &redirect_to= following
+
 = 2.10 =
-* Add setting to no display a Users submenu option for the plugin's settings
+* Add setting to not display a Users submenu option for the plugin's settings
 * Conditional logic for Settings Saved update message in Validate function
 
 = 2.9 =
@@ -127,6 +130,9 @@ A Capability of manage_options is required to access the plugin's settings from 
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.10.1 =
+Landing Location obeyed for direct access with wp-login.php URL
 
 = 2.10 =
 Allow deletion of Users submenu entry for plugin settings
