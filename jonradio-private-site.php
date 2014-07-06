@@ -3,7 +3,7 @@
 Plugin Name: jonradio Private Site
 Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
 Description: Creates a Private Site by allowing only those logged on to view the WordPress web site.  Settings select the initial destination after login.
-Version: 2.10.1
+Version: 2.11
 Author: jonradio
 Author URI: http://jonradio.com/plugins
 License: GPLv2

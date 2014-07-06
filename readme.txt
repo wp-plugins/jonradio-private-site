@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 3.9
-Stable tag: 2.10.1
+Stable tag: 2.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,6 +68,10 @@ A Capability of manage_options is required to access the plugin's settings from 
 
 == Changelog ==
 
+= 2.11 =
+* In a WordPress Network ("Multisite"), block Users with No Role on the current Site
+* Make Landing Location work when free Paid Membership Pro plugin is activated 
+
 = 2.10.1 =
 * Add setting to obey Landing Location for users who login via a URL of wp-login.php without a &redirect_to= following
 
@@ -130,6 +134,9 @@ A Capability of manage_options is required to access the plugin's settings from 
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.11 =
+Improves Multisite security and supports Paid Membership Pro
 
 = 2.10.1 =
 Landing Location obeyed for direct access with wp-login.php URL

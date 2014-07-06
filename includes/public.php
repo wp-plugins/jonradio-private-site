@@ -13,14 +13,32 @@ add_filter( 'login_url', 'jr_ps_login_url' );
 
 $settings = get_option( 'jr_ps_settings' );
 if ( $settings['wplogin_php'] ) {
-	add_filter( 'login_redirect', 'jr_ps_login_redirect_filter', 10, 3 );
-}
-
-function jr_ps_login_redirect_filter( $redirect_to, $requested_redirect_to, $user ) {
-	if ( '' === $requested_redirect_to ) {
-		$redirect_to = jr_ps_after_login_url();
+	/*	Run this Filter "last" (Priority=100) to be sure that Paid Memberships Pro
+		has already runs its Filter.
+	*/
+	add_filter( 'login_redirect', 'jr_ps_login_redirect_filter', 100, 3 );
+	/*	Since it is defined when the plugin is loaded,
+		wait to check for the Paid Memberships Pro function.
+	*/
+	add_action( 'plugins_loaded', 'jr_ps_plugins_loaded' );
+	function jr_ps_plugins_loaded() {
+		if ( function_exists( 'pmpro_login_redirect' ) ) {
+			add_filter( 'pmpro_login_redirect_url', 'jr_ps_pmpro_login_redirect_url_filter', 10, 3 );
+			function jr_ps_pmpro_login_redirect_url_filter( $redirect_to, $requested_redirect_to, $user ) {
+				$redirect = jr_ps_login_redirect_filter( $redirect_to, $requested_redirect_to, $user );
+				DEFINE( 'JR_PS_PMPRO_RUN', TRUE );
+				return $redirect;
+			}
+		}	
 	}
-	return $redirect_to;
+	function jr_ps_login_redirect_filter( $redirect_to, $requested_redirect_to, $user ) {
+		if ( !defined( 'JR_PS_PMPRO_RUN' ) ) {
+			if ( '' === $requested_redirect_to ) {
+				$redirect_to = jr_ps_after_login_url();
+			}
+		}
+		return $redirect_to;
+	}
 }
 
 /**
@@ -44,9 +62,30 @@ function jr_ps_login() {
  * @return   NULL                Nothing is returned
  */
 function jr_ps_force_login() {
-	global $jr_ps_is_login;
-	if ( is_user_logged_in() || isset( $jr_ps_is_login ) ) {
+	/*	return statements are performed only if User does not need to login.
+	
+		First, check if User is on a Login panel.
+	*/
+	global $jr_ps_is_login, $jr_ps_plugin_data;
+	if ( isset( $jr_ps_is_login ) ) {
 		return;
+	}
+	
+	/*	Next, check if User is already logged in, and has a Role on this Site.
+	*/
+	$role = TRUE;
+	if ( is_user_logged_in() ) {
+		if ( is_multisite() ) {
+			if ( is_user_member_of_blog() ) {
+				return;
+			} else {
+				/*	User is logged on to a Site where he/she has no Role.
+				*/
+				$role = FALSE;
+			}
+		} else {
+		 	return;
+		}
 	}
 	
 	$settings = get_option( 'jr_ps_settings' );
@@ -127,6 +166,29 @@ function jr_ps_force_login() {
 				return;
 			}
 		}
+	}
+	
+	/*	Point of No Return:
+		We now know that the Visitor must be forced to login
+		if the Visitor wants to see the current URL.
+	*/
+	
+	if ( !$role ) {
+		/*	User is logged on to a Site where he/she has no Role.
+		*/
+		echo 'You (User "' 
+			. wp_get_current_user()->user_login
+			. '") cannot view this Site ("'
+			. get_bloginfo( 'name', 'display' )
+			. '") and you are being logged off.<hr />';
+			wp_logout();
+			echo 'Your User ID has not been defined to this Site. '
+				. 'If you believe that you should be able to access this Site, '
+				. 'please contact your network administrator or this site\'s webmaster, '
+				. 'and mention that your access was blocked by the <em>'
+				. $jr_ps_plugin_data['Name']
+				. '</em> plugin.';
+			wp_die();
 	}
 	
 	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
