@@ -176,19 +176,18 @@ function jr_ps_force_login() {
 	if ( !$role ) {
 		/*	User is logged on to a Site where he/she has no Role.
 		*/
-		echo 'You (User "' 
+		$message = 'You (User "' 
 			. wp_get_current_user()->user_login
 			. '") cannot view this Site ("'
 			. get_bloginfo( 'name', 'display' )
-			. '") and you are being logged off.<hr />';
-			wp_logout();
-			echo 'Your User ID has not been defined to this Site. '
-				. 'If you believe that you should be able to access this Site, '
-				. 'please contact your network administrator or this site\'s webmaster, '
-				. 'and mention that your access was blocked by the <em>'
-				. $jr_ps_plugin_data['Name']
-				. '</em> plugin.';
-			wp_die();
+			. '").<hr />'
+			. 'Your User ID has not been defined to this Site. '
+			. 'If you believe that you should be able to access this Site, '
+			. 'please contact your network administrator or this site\'s webmaster, '
+			. 'and mention that your access was blocked by the <em>'
+			. $jr_ps_plugin_data['Name']
+			. '</em> plugin.';
+		wp_die( $message );
 	}
 	
 	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
