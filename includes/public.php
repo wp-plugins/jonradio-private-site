@@ -71,6 +71,8 @@ function jr_ps_force_login() {
 		return;
 	}
 	
+	$settings = get_option( 'jr_ps_settings' );
+	
 	/*	Next, check if User is already logged in, and has a Role on this Site.
 	*/
 	$role = TRUE;
@@ -81,14 +83,19 @@ function jr_ps_force_login() {
 			} else {
 				/*	User is logged on to a Site where he/she has no Role.
 				*/
-				$role = FALSE;
+				if ( $settings['check_role'] ) {
+					$role = FALSE;
+				} else {
+					/*	User can see all of public site.
+					*/
+					return;
+				}
 			}
 		} else {
 		 	return;
 		}
 	}
 	
-	$settings = get_option( 'jr_ps_settings' );
 	/*	URL of current page without http://, i.e. - starting with domain
 	*/
 	$current_url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
@@ -172,7 +179,6 @@ function jr_ps_force_login() {
 		We now know that the Visitor must be forced to login
 		if the Visitor wants to see the current URL.
 	*/
-	
 	if ( !$role ) {
 		/*	User is logged on to a Site where he/she has no Role.
 		*/

@@ -241,6 +241,14 @@ function jr_ps_admin_init() {
 		'jr_ps_settings_page', 
 		'jr_ps_advanced_settings_section' 
 	);
+	if ( is_multisite() ) {
+		add_settings_field( 'check_role', 
+			'Check User Role on Site?', 
+			'jr_ps_echo_check_role', 
+			'jr_ps_settings_page', 
+			'jr_ps_advanced_settings_section' 
+		);
+	}
 }
 
 /**
@@ -557,6 +565,16 @@ function jr_ps_input_user_submenu( $type ) {
 	}
 }
 
+function jr_ps_echo_check_role() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="check_role" name="jr_ps_settings[check_role]" value="true" '
+		. checked( TRUE, $settings['check_role'], FALSE )
+		. ' />'
+		. ' Only allow Users listed <a href="'
+		. admin_url( 'users.php' )
+		. '">here</a> to view this site (Security: a check mark in this checkbox is recommended)';
+}
+
 function jr_ps_validate_settings( $input ) {
 	$valid = array();
 	$settings = get_option( 'jr_ps_settings' );
@@ -704,6 +722,13 @@ function jr_ps_validate_settings( $input ) {
 				update_site_option( 'registration', $input['registrations'] );
 			}	
 		}
+		/*	Only in Form in WordPress Network
+		*/
+		if ( isset( $input['check_role'] ) && ( $input['check_role'] === 'true' ) ) {
+			$valid['check_role'] = TRUE;
+		} else {
+			$valid['check_role'] = FALSE;
+		}
 	} else {
 		if ( isset( $input['membership'] ) ) {
 			$mem = $input['membership'];
@@ -711,6 +736,9 @@ function jr_ps_validate_settings( $input ) {
 			$mem = '0';
 		}
 		update_option( 'users_can_register', $mem );
+		/*	Not in Form except in WordPress Network
+		*/
+		$valid['check_role'] = $settings['check_role'];
 	}
 	
 	foreach ( array( 'excl_url', 'excl_url_prefix' ) as $key ) {

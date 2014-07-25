@@ -3,8 +3,8 @@ Contributors: jonradio
 Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
-Tested up to: 3.9
-Stable tag: 2.11.1
+Tested up to: 3.9.1
+Stable tag: 2.11.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,9 @@ This setting controls whether the plugin's settings are accessible from the User
 A Capability of manage_options is required to access the plugin's settings from the Settings submenu.  A Capability of manage_users is required to access the plugin's settings from the Users submenu.
 
 == Changelog ==
+
+= 2.11.2 =
+* Provide a Setting to disable User with No Role behaviour introduced in 2.11
 
 = 2.11.1 =
 * Remove forced logout when User with No Role attempts to access a Site (Network/Multisite install), to fix repeated messages when wp_logout is hooked by other plugins
@@ -137,6 +140,9 @@ A Capability of manage_options is required to access the plugin's settings from 
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.11.2 =
+Add Setting to control User with No Role
 
 = 2.11.1 =
 Fix User with No Role errors on Network/Multisite
