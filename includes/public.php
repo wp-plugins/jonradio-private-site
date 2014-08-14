@@ -10,6 +10,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 add_action( 'login_init', 'jr_ps_login' );
 add_action( 'wp', 'jr_ps_force_login' );
 add_filter( 'login_url', 'jr_ps_login_url' );
+add_action( 'wp_login_failed', 'jr_ps_login_failed' );
 
 $settings = get_option( 'jr_ps_settings' );
 if ( $settings['wplogin_php'] ) {
@@ -265,6 +266,18 @@ function jr_ps_after_login_url() {
 			break;
 	}
 	return $after_login_url;
+}
+
+function jr_ps_login_failed() {
+	$settings = get_option( 'jr_ps_settings' );
+	if ( $settings['custom_login'] && !empty( $settings['login_url'] ) ) {
+		/*	wp_redirect( $url ) goes to $url right after exit on the line that follows.
+		*/
+		wp_redirect( jr_ps_login_url( $settings['login_url'] ) );
+		exit;
+	} else {
+		return;
+	}
 }
 
 ?>
