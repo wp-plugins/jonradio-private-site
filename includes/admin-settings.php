@@ -235,6 +235,12 @@ function jr_ps_admin_init() {
 		'jr_ps_advanced_settings_expl', 
 		'jr_ps_settings_page' 
 	);
+	add_settings_field( 'override_omit', 
+		'Allow Landing Location for Custom Login pages', 
+		'jr_ps_echo_override_omit', 
+		'jr_ps_settings_page', 
+		'jr_ps_advanced_settings_section' 
+	);
 	add_settings_field( 'user_submenu', 
 		'User Submenu?', 
 		'jr_ps_echo_user_submenu', 
@@ -382,7 +388,7 @@ function jr_ps_echo_landing() {
 		'return' => 'Return to same URL',
 	    'home'   => 'Go to Site Home',
 	    'admin'  => 'Go to WordPress Admin Dashboard',
-		'omit'   => 'Omit <code>?redirect_to=</code> from URL (a check mark in this checkbox is recommended for Custom Login pages)', 
+		'omit'   => 'Omit <code>?redirect_to=</code> from URL (this option is recommended for Custom Login pages)', 
 	    'url'    => 'Go to Specific URL'
 		) as $val => $desc ) {
 		if ( $first ) {
@@ -525,6 +531,32 @@ function jr_ps_echo_excl_url_del() {
 }
 
 function jr_ps_advanced_settings_expl() {
+	?>
+	<p>
+	The
+	<b>
+	Allow Landing Location for Custom Login pages
+	</b>
+	setting shown immediately below will,
+	under some circumstances,
+	lock you out of your own WordPress site
+	and prevent Visitors from viewing your site.
+	You will have to rename or delete the
+	<code>
+	/wp-contents/plugins/jonradio-private-site/
+	</code>
+	folder with FTP or a File Manager provided with your web hosting.
+	If you are not familiar with either of these methods
+	for deleting files within your WordPress installation,
+	you risk making your WordPress site completely inoperative.
+	</p>
+	<?php
+}
+
+function jr_ps_echo_override_omit() {
+	$settings = get_option( 'jr_ps_settings' );
+	echo '<input type="checkbox" id="override_omit" name="jr_ps_settings[override_omit]" value="true"'
+		. checked( TRUE, $settings['override_omit'], FALSE ) . ' /> Can Lock You Out of Your WordPress Site! (see paragraph above)';
 }
 
 function jr_ps_echo_user_submenu() {
@@ -579,22 +611,12 @@ function jr_ps_validate_settings( $input ) {
 	$valid = array();
 	$settings = get_option( 'jr_ps_settings' );
 	
-	if ( isset( $input['private_site'] ) && ( $input['private_site'] === 'true' ) ) {
-		$valid['private_site'] = TRUE;
-	} else {
-		$valid['private_site'] = FALSE;
-	}
-	
-	if ( isset( $input['reveal_registration'] ) && ( $input['reveal_registration'] === 'true' ) ) {
-		$valid['reveal_registration'] = TRUE;
-	} else {
-		$valid['reveal_registration'] = FALSE;
-	}
-
-	if ( isset( $input['wplogin_php'] ) && ( $input['wplogin_php'] === 'true' ) ) {
-		$valid['wplogin_php'] = TRUE;
-	} else {
-		$valid['wplogin_php'] = FALSE;
+	foreach ( array( 'private_site', 'reveal_registration', 'wplogin_php', 'override_omit' ) as $opt ) {
+		if ( isset( $input[ $opt ] ) && ( 'true' === $input[ $opt ] ) ) {
+			$valid[ $opt ] = TRUE;
+		} else {
+			$valid[ $opt ] = FALSE;
+		}
 	}
 
 	$url = jr_v1_sanitize_url( $input['specific_url'] );
@@ -682,7 +704,7 @@ function jr_ps_validate_settings( $input ) {
 	}
 	$valid['login_url'] = $url;
 	
-	if ( isset( $input['custom_login'] ) && ( $input['custom_login'] === 'true' ) ) {
+	if ( isset( $input['custom_login'] ) && ( 'true' === $input['custom_login'] ) ) {
 		if ( '' === $valid['login_url'] ) {
 			add_settings_error(
 				'jr_ps_settings',
@@ -693,15 +715,12 @@ function jr_ps_validate_settings( $input ) {
 			$valid['custom_login'] = FALSE;
 		} else {
 			$valid['custom_login'] = TRUE;
-			/*	Was Custom Login just turned on?
-				If so, be sure Landing Location is set to Omit.
-			*/
-			if ( !$setting['custom_login'] && ( 'omit' !== $valid['landing'] ) ) {
+			if ( ( !$valid['override_omit'] ) && ( 'omit' !== $valid['landing'] ) ) {
 				$valid['landing'] = 'omit';
 				add_settings_error(
 					'jr_ps_settings',
 					'jr_ps_setomit',
-					'Landing Location changed to "Omit", recommended for Custom Login pages.',
+					'Landing Location changed to "Omit", recommended for Custom Login pages. See Advanced Settings to Override, but please read Warnings first.',
 					'updated'
 				);
 			}

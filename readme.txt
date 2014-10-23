@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 4.0
-Stable tag: 2.11.4
+Stable tag: 2.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,6 +67,12 @@ This setting controls whether the plugin's settings are accessible from the User
 A Capability of manage_options is required to access the plugin's settings from the Settings submenu.  A Capability of manage_users is required to access the plugin's settings from the Users submenu.
 
 == Changelog ==
+
+= 2.12 =
+* Wait until Pretty Permalinks applied before deciding whether to force a login
+* Add an Override Advanced Setting with Warnings on Usage, to allow Landing Location and Custom Login to both be specified.
+* Correct coding error that allowed Landing Location with Custom Login, a potential Redirection error
+* Fix Error Log warning on [mb]strpos Offset parameter
 
 = 2.11.4 =
 * Use Custom Login setting, if present, to redirect failed login attempts with blank username and/or password
@@ -148,7 +154,7 @@ A Capability of manage_options is required to access the plugin's settings from 
 == Upgrade Notice ==
 
 = 2.11.3 =
-Correct Blank Username/Password when Custom Login selected
+Correct handling of www. in a URL by waiting until Pretty Permalinks applied before deciding whether to force Login
 
 = 2.11.3 =
 Correct Failed Logins when Custom Login selected

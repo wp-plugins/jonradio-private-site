@@ -294,7 +294,7 @@ if ( !function_exists( 'jr_v1_prep_url' ) ) {
 			$parms = explode( '&', $parse_array['query'] );
 			$parse_array['query'] = array();
 			foreach( $parms as $parm ) {
-				if ( FALSE === ( $cursor = jr_v1_strpos( $parm, '=', 1 ) ) ) {
+				if ( FALSE === ( $cursor = jr_v1_strpos( $parm, '=' ) ) ) {
 					$parse_array['query'][$parm] = '';
 				} else {
 					/*	Include the Equals Sign ("=") as the first character of the Query Value
