@@ -3,7 +3,7 @@
 Plugin Name: jonradio Private Site
 Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
 Description: Creates a Private Site by allowing only those logged on to view the WordPress web site.  Settings select the initial destination after login.
-Version: 2.12
+Version: 2.13
 Author: jonradio
 Author URI: http://jonradio.com/plugins
 License: GPLv2
@@ -103,7 +103,7 @@ if ( version_compare( $old_version, $jr_ps_plugin_data['Version'], '!=' ) ) {
 }
 
 require_once( jr_ps_path() . 'includes/common-functions.php' );
-jr_v1_validate_settings( 'jr_ps_settings',
+jr_ps_init_settings( 'jr_ps_settings',
 	array(
 		'private_site'        => FALSE,
 		'reveal_registration' => TRUE,
@@ -115,10 +115,10 @@ jr_v1_validate_settings( 'jr_ps_settings',
 		'excl_url'            => array(),
 		'excl_url_prefix'     => array(),
 		'excl_home'           => FALSE,
-		'user_submenu'        => TRUE,
 		'check_role'          => TRUE,
 		'override_omit'       => FALSE
-	)
+	),
+	array( 'user_submenu' )
 );
 $settings = get_option( 'jr_ps_settings' );
 if ( is_admin() ) {
@@ -146,6 +146,48 @@ if ( is_admin() ) {
 		//	Private Site code
 		require_once( jr_ps_path() . 'includes/public.php' );
 	}
+}
+
+/**
+ * Check for missing Settings and set them to defaults
+ * 
+ * Ensures that the Named Setting exists, and populates it with defaults for any missing values.
+ * Safe to use on every execution of a plugin because it only does an expensive Database Write
+ * when it finds missing Settings.
+ *
+ * @param	string	$name		Name of Settings as looked up with get_option()
+ * @param	array	$defaults	Each default Settings value in [key] => value format
+ * @param	array	$deletes	Each old Settings value to delete as [0] => key format
+ * @return  bool/Null			Return value from update_option(), or NULL if update_option() not called
+ */
+function jr_ps_init_settings( $name, $defaults, $deletes = array() ) {
+	$updated = FALSE;
+	if ( FALSE === ( $settings = get_option( $name ) ) ) {
+		$settings = $defaults;
+		$updated = TRUE;
+	} else {
+		foreach ( $defaults as $key => $value ) {
+			if ( !isset( $settings[$key] ) ) {
+				$settings[$key] = $value;
+				$updated = TRUE;
+			}
+		}
+		foreach ( $deletes as $key ) {
+			if ( isset( $settings[$key] ) ) {
+				/*	Don't need to check to UNSET,
+					but do need to know to set $updated
+				*/
+				unset( $settings[$key] );
+				$updated = TRUE;
+			}
+		}
+	}
+	if ( $updated ) {
+		$return = update_option( $name, $settings );
+	} else {
+		$return = NULL;
+	}
+	return $return;
 }
 
 /*	Documentation of Research Done for this Plugin:

@@ -37,40 +37,6 @@
 //	Exit if .php file accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
-/**
- * Check for missing Settings and set them to defaults
- * 
- * Ensures that the Named Setting exists, and populates it with defaults for any missing values.
- * Safe to use on every execution of a plugin because it only does an expensive Database Write
- * when it finds missing Settings.
- *
- * @param	string	$name		Name of Settings as looked up with get_option()
- * @param	array	$defaults	Each default Settings value in [key] => value format
- * @return  bool/Null			Return value from update_option(), or NULL if update_option() not called
- */
-if ( !function_exists( 'jr_v1_validate_settings' ) ) {
-	function jr_v1_validate_settings( $name, $defaults ) {
-		$updated = FALSE;
-		if ( FALSE === ( $settings = get_option( $name ) ) ) {
-			$settings = $defaults;
-			$updated = TRUE;
-		} else {
-			foreach ( $defaults as $key => $value ) {
-				if ( !isset( $settings[$key] ) ) {
-					$settings[$key] = $value;
-					$updated = TRUE;
-				}
-			}
-		}
-		if ( $updated ) {
-			$return = update_option( $name, $settings );
-		} else {
-			$return = NULL;
-		}
-		return $return;
-	}
-}
-
 /*	As well as dealing with the low probability that a single mb_ function has been disabled in a php.ini,
 	this also supports older versions of PHP as mb_ functions were introduced one by one over a number of php versions.
 */

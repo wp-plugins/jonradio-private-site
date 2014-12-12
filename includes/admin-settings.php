@@ -24,16 +24,7 @@ function jr_ps_admin_hook() {
 	//  Add Settings Page for this Plugin
 	global $jr_ps_plugin_data;
 	$settings = get_option( 'jr_ps_settings' );
-	if ( $settings['user_submenu'] ) {
-		add_users_page( $jr_ps_plugin_data['Name'], 'Private Site', 'add_users', 'jr_ps_settings', 'jr_ps_users_settings_page' );
-	}
 	add_options_page( $jr_ps_plugin_data['Name'], 'Private Site', 'manage_options', 'jr_ps_settings', 'jr_ps_settings_page' );
-}
-
-function jr_ps_users_settings_page() {
-	global $jr_ps_users_submenu;
-	$jr_ps_users_submenu = TRUE;
-	jr_ps_settings_page();
 }
 
 /**
@@ -238,12 +229,6 @@ function jr_ps_admin_init() {
 	add_settings_field( 'override_omit', 
 		'Allow Landing Location for Custom Login pages', 
 		'jr_ps_echo_override_omit', 
-		'jr_ps_settings_page', 
-		'jr_ps_advanced_settings_section' 
-	);
-	add_settings_field( 'user_submenu', 
-		'User Submenu?', 
-		'jr_ps_echo_user_submenu', 
 		'jr_ps_settings_page', 
 		'jr_ps_advanced_settings_section' 
 	);
@@ -542,9 +527,7 @@ function jr_ps_advanced_settings_expl() {
 	lock you out of your own WordPress site
 	and prevent Visitors from viewing your site.
 	You will have to rename or delete the
-	<code>
-	/wp-contents/plugins/jonradio-private-site/
-	</code>
+	<code>/wp-contents/plugins/jonradio-private-site/</code>
 	folder with FTP or a File Manager provided with your web hosting.
 	If you are not familiar with either of these methods
 	for deleting files within your WordPress installation,
@@ -557,44 +540,6 @@ function jr_ps_echo_override_omit() {
 	$settings = get_option( 'jr_ps_settings' );
 	echo '<input type="checkbox" id="override_omit" name="jr_ps_settings[override_omit]" value="true"'
 		. checked( TRUE, $settings['override_omit'], FALSE ) . ' /> Can Lock You Out of Your WordPress Site! (see paragraph above)';
-}
-
-function jr_ps_echo_user_submenu() {
-	global $jr_ps_users_submenu;
-	if ( isset( $jr_ps_users_submenu ) ) {
-		jr_ps_input_user_submenu( 'hidden' );
-		jr_ps_input_user_submenu( 'disabled' );
-		echo ' (this setting can not be altered from the User submenu)';
-	} else {
-		jr_ps_input_user_submenu( 'normal' );
-		echo ' Should this Settings page be listed in the Users submenu of the Admin panels? (It is always listed in the Settings submenu)';
-	}
-}
-
-/**
- * Creates <input> for user_submenu
- * 
- * Build an <input type=checkbox> form field, or not, of the specified type,
- * based on the current value of the user_submenu setting.
- *
- * @param	string	$type		hidden, disabled, normal
- * @return  Null				Nothing is returned
- */
-function jr_ps_input_user_submenu( $type ) {
-	$settings = get_option( 'jr_ps_settings' );
-	$common = ' id="user_submenu" name="jr_ps_settings[user_submenu]" value="true" ';
-	if ( 'hidden' === $type ) {
-		if ( $settings['user_submenu'] ) {
-			echo '<input type="hidden"' . $common . '/>';
-		}
-	} else {
-		echo '<input type="checkbox"' . $common;
-		if ( 'disabled' === $type ) {
-			echo 'disabled="disabled" ';
-		}
-		echo checked( TRUE, $settings['user_submenu'], FALSE )
-			. ' />';
-	}
 }
 
 function jr_ps_echo_check_role() {
@@ -807,20 +752,9 @@ function jr_ps_validate_settings( $input ) {
 			}
 		}
 	}
-
-	if ( isset( $input['user_submenu'] ) && ( $input['user_submenu'] === 'true' ) ) {
-		$valid['user_submenu'] = TRUE;
-	} else {
-		$valid['user_submenu'] = FALSE;
-	}
 	
-	global $jr_ps_users_submenu;
-	/*	This conditional is really a poor solution, but it is the only thing I could find that worked.
-		Anything else gave me zero or two Settings Saved messages, with the main problem being on the 
-		Settings submenu page when checkbox was filled for 'user_submenu' and Save Settings button hit.
-	*/
 	$errors = get_settings_errors();
-	if ( $valid['user_submenu'] = TRUE || ( ( isset( $jr_ps_users_submenu ) ) && ( empty( $errors ) ) ) ) {
+	if ( isset( $jr_ps_users_submenu ) && empty( $errors ) ) {
 		add_settings_error(
 			'jr_ps_settings',
 			'jr_ps_saved',

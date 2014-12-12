@@ -3,8 +3,8 @@ Contributors: jonradio
 Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
-Tested up to: 4.0
-Stable tag: 2.12
+Tested up to: 4.1
+Stable tag: 2.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,13 +60,15 @@ This problem has been observed when the URL of the Custom Login page is a WordPr
 
 Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin panels), this *jonradio Private Site* plugin does **not** automatically change any URLs you have entered in the plugin's Settings.  You will therefore want to make changes to URLs in the plugin's Settings whenever you change Permalinks.
 
-= Why is User Submenu? setting greyed out? =
+= Why has the plugin's Settings entry disappeared from the WordPress Admin Users submenu? =
 
-This setting controls whether the plugin's settings are accessible from the Users submenu of the WordPress Admin panels.  For security reasons, it can only be used when the plugin's settings are accessed from the Settings submenu.
-
-A Capability of manage_options is required to access the plugin's settings from the Settings submenu.  A Capability of manage_users is required to access the plugin's settings from the Users submenu.
+At user request, to reduce clutter.
 
 == Changelog ==
+
+= 2.13 =
+* Remove Plugin's entry on Users submenu on WordPress Admin panels
+* Remove associated Setting, which determined whether Users submenu entry existed
 
 = 2.12 =
 * Wait until Pretty Permalinks applied before deciding whether to force a login
@@ -153,7 +155,10 @@ A Capability of manage_options is required to access the plugin's settings from 
 
 == Upgrade Notice ==
 
-= 2.11.3 =
+= 2.13 =
+Reduce WordPress Admin panels Menu clutter by removing plugin Settings from Users submenu
+
+= 2.12 =
 Correct handling of www. in a URL by waiting until Pretty Permalinks applied before deciding whether to force Login
 
 = 2.11.3 =
