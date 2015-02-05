@@ -4,7 +4,7 @@ Donate link: http://jonradio.com/plugins
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 4.1
-Stable tag: 2.13
+Stable tag: 2.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,11 @@ Whenever you change your WordPress Permalinks (Settings-Permalinks in Admin pane
 At user request, to reduce clutter.
 
 == Changelog ==
+
+= 2.14 =
+* Force login at 'get_header' instead of 'template_redirect' Action to be compatible with wpengine.com hosting
+* Allow Custom Login page that is NOT on the current WordPress site, and clean up Settings page validation of related fields
+* Fix double display of Error Messages on Settings page
 
 = 2.13 =
 * Remove Plugin's entry on Users submenu on WordPress Admin panels
@@ -154,6 +159,9 @@ At user request, to reduce clutter.
 * Add in-line documentation for php functions
 
 == Upgrade Notice ==
+
+= 2.14 =
+Support wpengine.com hosting and off-site Login pages
 
 = 2.13 =
 Reduce WordPress Admin panels Menu clutter by removing plugin Settings from Users submenu
