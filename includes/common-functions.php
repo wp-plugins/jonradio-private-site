@@ -5,7 +5,7 @@
 	See details below license.
 */
 
-/*  Copyright 2013  jonradio  (email : info@jonradio.com)
+/*  Copyright 2013  jonradio  (email : info@zatz.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
