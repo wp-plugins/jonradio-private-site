@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: jonradio Private Site
-Plugin URI: http://jonradio.com/plugins/jonradio-private-site/
+Plugin URI: http://zatzlabs.com/lab-notes/
 Description: Creates a Private Site by allowing only those logged on to view the WordPress web site.  Settings select the initial destination after login.
 Version: 2.14
-Author: jonradio, dgewirtz
-Author URI: http://jonradio.com/plugins
+Author: dgewirtz
+Author URI: http://zatzlabs.com/lab-notes/
 License: GPLv2
 */
 
