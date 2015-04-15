@@ -1,4 +1,4 @@
-=== Private Site ===
+=== My Private Site ===
 Contributors: dgewirtz
 Donate link: http://zatzlabs.com/lab-notes/
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
