@@ -1,5 +1,5 @@
 === jonradio Private Site ===
-Contributors: jonradio, dgewirtz
+Contributors: dgewirtz, dgewirtz
 Donate link: http://zatzlabs.com/plugins/
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
