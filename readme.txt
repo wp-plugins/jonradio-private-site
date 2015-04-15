@@ -1,6 +1,6 @@
-=== jonradio Private Site ===
+=== Private Site ===
 Contributors: dgewirtz
-Donate link: http://zatzlabs.com/plugins/
+Donate link: http://zatzlabs.com/lab-notes/
 Tags: login, visibility, private, security, plugin, pages, page, posts, post
 Requires at least: 3.0
 Tested up to: 4.2
@@ -11,6 +11,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Create a Private Site visible only to your registered users.
 
 == Description ==
+
+*Formerly: "jonradio Private Site"*
 
 Allows the Administrator to restrict a WordPress-based web site to viewing only by registered users who are logged on.  Any attempt, by anyone not logged, to view any Page, Post or other part of the site will display a WordPress login screen.
 
@@ -38,6 +40,11 @@ Another Setting allows the Private Site feature to be turned off.  When the plug
 If a WordPress Network is defined, the plugin can be activated individually for select sites.  Or Network Activated.  In either case, each site will have its own Settings page where the Private Site feature can be turned off (default) or on for just the one site, and a Landing Location defined for each site.
 
 Yes, there are other plugins that hide some or all WordPress content for any site visitor who is not logged on.  But when I was searching for a solution for one of the web sites I support, I decided to "write my own" because I knew how it worked and felt comfortable that there would be no way for anyone not logged in to view the site, including Search Engines.
+
+> <strong>Adoption Notice</strong><br>
+> This plugin was recently adopted by David Gewirtz and ongoing support and updates will continue. Feel free to visit [David's Lab Notes](http://zatzlabs.com/lab-notes/) for additional details and to sign up for emailed news updates.
+
+Special thanks to Jon 'jonradio' Pearkins for creating the plugin and making adoption possible.
 
 == Installation ==
 
